@@ -1,5 +1,5 @@
-#include "constants.h"
-
+#define MAX_TASKS 10000
+#define MAX_DESCRIPTION_LENGTH 50
 typedef struct
 {
 	short id;

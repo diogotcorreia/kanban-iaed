@@ -1,8 +1,7 @@
 /* Diogo Correia - ist199211 */
 #include <stdio.h>
 
-#include "constants.h"
-#include "tasks.h"
+#include "activities.h"
 
 /* Recebe um comando do stdin, e redireciona para a função desejada */
 int handle_command();
@@ -11,6 +10,7 @@ void handle_add_task_command();
 
 int main()
 {
+	setup_activities();
 	while (handle_command())
 		;
 	print_all_tasks(); /* TODO temporarily show all tasks on quit */
