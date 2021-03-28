@@ -56,12 +56,27 @@ int is_duplicate_description(char description[], int tasks_size)
 /* Imprime todas as tarefas, ordenadas pela sua descrição, para o stdout */
 void print_all_tasks()
 {
+	/* TODO this should print the tasks ordered by description */
 	int i = 0;
 	task task;
 	activity activity;
 	while ((task = task_store[i++]).id > 0)
 	{
 		activity = get_activity(task.activity);
-		printf("%d %s #%d %s", task.id, activity.name, task.duration, task.description);
+		printf(TASK_TO_STRING, task.id, activity.name, task.duration, task.description);
+	}
+}
+
+void print_task_by_id(int id)
+{
+	task task = task_store[id - 1];
+	if (task.id > 0)
+	{
+		activity activity = get_activity(task.activity);
+		printf(TASK_TO_STRING, task.id, activity.name, task.duration, task.description);
+	}
+	else
+	{
+		printf(TASK_ERR_NO_SUCH_TASK, id);
 	}
 }

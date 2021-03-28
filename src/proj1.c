@@ -9,12 +9,13 @@ int handle_command();
 
 void handle_add_task_command();
 
+void handle_list_tasks_command();
+
 int main()
 {
 	setup_activities();
 	while (handle_command())
 		;
-	print_all_tasks(); /* TODO temporarily show all tasks on quit */
 	return 0;
 }
 
@@ -25,6 +26,9 @@ int handle_command()
 	{
 	case 't':
 		handle_add_task_command();
+		return 1;
+	case 'l':
+		handle_list_tasks_command();
 		return 1;
 	case 'q':
 	default:
@@ -47,14 +51,45 @@ void handle_add_task_command()
 
 	if (result_task.id == -1)
 	{
-		printf("too many tasks\n");
+		printf(TASK_ERR_TOO_MANY_TASKS);
 	}
 	else if (result_task.id == -2)
 	{
-		printf("duplicate description\n");
+		printf(TASK_ERR_DUPLICATE_DESCRIPTION);
 	}
 	else
 	{
-		printf("task %d\n", result_task.id);
+		printf(TASK_ADD_SUCCESS, result_task.id);
+	}
+}
+
+void handle_list_tasks_command()
+{
+	int id = 0, all = 1;
+	char c;
+
+	while ((c = getchar()) != EOF && c != '\n')
+	{
+		if (c < '0' || c > '9')
+		{
+			if (id != 0)
+			{
+				print_task_by_id(id);
+			}
+			id = 0;
+		}
+		else
+		{
+			id = id * 10 + c - '0';
+			all = 0;
+		}
+	}
+	if (id != 0)
+	{
+		print_task_by_id(id);
+	}
+	if (all)
+	{
+		print_all_tasks();
 	}
 }
