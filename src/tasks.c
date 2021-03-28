@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "tasks.h"
+#include "activities.h"
 
 static task task_store[MAX_TASKS] = {{0}};
 
@@ -20,16 +21,17 @@ task add_task(int duration, char description[])
 	task new_task;
 	if (id == MAX_TASKS)
 	{
-		task too_many_tasks = {-1, 0, ""};
+		task too_many_tasks = {-1, 0, "", 0};
 		return too_many_tasks;
 	}
 	if (is_duplicate_description(description, id))
 	{
-		task duplicate_task = {-2, 0, ""};
+		task duplicate_task = {-2, 0, "", 0};
 		return duplicate_task;
 	}
 	new_task.id = id + 1;
 	new_task.duration = duration;
+	new_task.activity = 0;
 	strcpy(new_task.description, description);
 
 	task_store[id++] = new_task;
@@ -56,8 +58,10 @@ void print_all_tasks()
 {
 	int i = 0;
 	task task;
+	activity activity;
 	while ((task = task_store[i++]).id > 0)
 	{
-		printf("%d %s %d %s", task.id, "TODO", task.duration, task.description);
+		activity = get_activity(task.activity);
+		printf("%d %s #%d %s", task.id, activity.name, task.duration, task.description);
 	}
 }

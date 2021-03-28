@@ -40,6 +40,7 @@ void handle_add_task_command()
 	task result_task;
 
 	scanf("%d", &duration);
+	getchar(); /* consume space before description */
 	fgets(description, MAX_DESCRIPTION_LENGTH, stdin);
 
 	result_task = add_task(duration, description);

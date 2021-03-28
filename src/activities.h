@@ -15,4 +15,6 @@ typedef struct
 
 void setup_activities();
 
+activity get_activity(int index);
+
 #endif

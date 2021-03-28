@@ -16,3 +16,8 @@ void setup_activities()
     activities[i] = current_activity;
   }
 }
+
+activity get_activity(int index)
+{
+  return activities[index];
+}
