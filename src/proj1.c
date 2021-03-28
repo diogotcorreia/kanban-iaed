@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "activities.h"
+#include "tasks.h"
 
 /* Recebe um comando do stdin, e redireciona para a função desejada */
 int handle_command();

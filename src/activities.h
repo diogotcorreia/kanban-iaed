@@ -1,3 +1,6 @@
+#ifndef ACTIVIES_H
+#define ACTIVIES_H
+
 #include "tasks.h"
 
 #define MAX_ACTIVITY_NAME_LENGTH 50
@@ -11,3 +14,5 @@ typedef struct
 } activity;
 
 void setup_activities();
+
+#endif

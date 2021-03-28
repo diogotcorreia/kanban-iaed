@@ -1,3 +1,6 @@
+#ifndef TASKS_H
+#define TASKS_H
+
 #define MAX_TASKS 10000
 #define MAX_DESCRIPTION_LENGTH 50
 typedef struct
@@ -12,3 +15,5 @@ task add_task(int duration, char description[]);
 int is_duplicate_description(char description[], int tasks_size);
 
 void print_all_tasks();
+
+#endif
