@@ -1,5 +1,6 @@
 /* Diogo Correia - ist199211 */
 #include <stdio.h>
+#include <ctype.h>
 
 #include "activities.h"
 #include "tasks.h"
@@ -10,6 +11,8 @@ int handle_command();
 void handle_add_task_command();
 
 void handle_list_tasks_command();
+
+void handle_activities_command();
 
 int main()
 {
@@ -29,6 +32,9 @@ int handle_command()
 		return 1;
 	case 'l':
 		handle_list_tasks_command();
+		return 1;
+	case 'a':
+		handle_activities_command();
 		return 1;
 	case 'q':
 	default:
@@ -91,5 +97,43 @@ void handle_list_tasks_command()
 	if (all)
 	{
 		print_all_tasks();
+	}
+}
+
+void handle_activities_command()
+{
+	char c;
+	int i = 0;
+	char name[MAX_ACTIVITY_NAME_LENGTH];
+	activity new_activity;
+
+	while ((c = getchar()) != EOF && c != '\n' && i < MAX_ACTIVITY_NAME_LENGTH - 1)
+	{
+		if (i || !isspace(c))
+		{
+			name[i++] = c;
+		}
+	}
+	name[i] = '\0';
+
+	if (i)
+	{
+		new_activity = add_activity(name);
+		switch (new_activity.status)
+		{
+		case -1:
+			printf(ACTIVITY_ERR_TOO_MANY);
+			break;
+		case -2:
+			printf(ACTIVITY_ERR_DUPLICATE);
+			break;
+		case -3:
+			printf(ACTIVITY_ERR_INVALID_DESC);
+			break;
+		}
+	}
+	else
+	{
+		list_all_activities();
 	}
 }
