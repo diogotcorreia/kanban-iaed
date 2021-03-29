@@ -6,7 +6,7 @@
 /* tasks */
 
 #define MAX_TASKS 10000
-#define MAX_DESCRIPTION_LENGTH 50
+#define MAX_DESCRIPTION_LENGTH 51
 
 #define TASK_ADD_SUCCESS "task %d\n"
 #define TASK_TO_STRING "%d %s #%d %s\n"
@@ -25,7 +25,7 @@
 
 /* activities */
 
-#define MAX_ACTIVITY_NAME_LENGTH 50
+#define MAX_ACTIVITY_NAME_LENGTH 51
 #define MAX_ACTIVITIES 10
 
 #define ACTIVITY_TODO "TO DO"
@@ -39,7 +39,7 @@
 
 /* users */
 
-#define MAX_USER_NAME_LENGTH 20
+#define MAX_USER_NAME_LENGTH 21
 #define MAX_USERS 50
 
 #define USER_TO_STRING "%s\n"
