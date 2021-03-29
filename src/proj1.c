@@ -111,6 +111,13 @@ void handle_time_forward_command(kanban *global_store)
 {
 	int increment;
 	scanf("%d", &increment);
+
+	if (increment < 0)
+	{
+		printf(TIME_ERR_INVALID);
+		return;
+	}
+
 	global_store->time += increment;
 	printf("%d\n", global_store->time);
 }

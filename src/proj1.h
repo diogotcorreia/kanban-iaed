@@ -1,10 +1,12 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define MAX_TASKS 10000
-#define MAX_DESCRIPTION_LENGTH 50
+#define TIME_ERR_INVALID "invalid time\n"
 
 /* tasks */
+
+#define MAX_TASKS 10000
+#define MAX_DESCRIPTION_LENGTH 50
 
 #define TASK_ADD_SUCCESS "task %d\n"
 #define TASK_TO_STRING "%d %s #%d %s\n"
