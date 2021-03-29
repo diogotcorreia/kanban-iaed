@@ -21,17 +21,19 @@ task add_task(int duration, char description[])
 	task new_task;
 	if (id == MAX_TASKS)
 	{
-		task too_many_tasks = {-1, 0, "", 0};
+		task too_many_tasks = {-1, 0, "", 0, -1, -1};
 		return too_many_tasks;
 	}
 	if (is_duplicate_description(description, id))
 	{
-		task duplicate_task = {-2, 0, "", 0};
+		task duplicate_task = {-2, 0, "", 0, -1, -1};
 		return duplicate_task;
 	}
 	new_task.id = id + 1;
 	new_task.duration = duration;
 	new_task.activity = 0;
+	new_task.start_time = -1;
+	new_task.user_id = -1;
 	strcpy(new_task.description, description);
 
 	task_store[id++] = new_task;

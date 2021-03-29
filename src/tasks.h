@@ -14,6 +14,7 @@
 #define TASK_MOVE_ERR_ALREADY_STARTED "task already started\n"
 #define TASK_MOVE_ERR_NO_SUCH_USER "no such user\n"
 #define TASK_MOVE_ERR_NO_SUCH_ACTIVITY "no such activity\n"
+#define TASK_MOVE_DURATION "duration=%d slack=%d\n"
 
 typedef struct
 {
@@ -21,6 +22,8 @@ typedef struct
 	int duration;
 	char description[MAX_DESCRIPTION_LENGTH];
 	int activity;
+	int start_time;
+	int user_id;
 } task;
 
 task add_task(int duration, char description[]);

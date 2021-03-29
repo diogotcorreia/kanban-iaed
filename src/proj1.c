@@ -204,7 +204,19 @@ void handle_move_command()
 		return;
 	}
 
+	if (task.activity == 0)
+	{
+		task.start_time = time;
+	}
+
 	task.activity = activity_id;
+	task.user_id = user_id;
+
+	if (strcmp(activity, ACTIVITY_DONE) == 0)
+	{
+		printf(TASK_MOVE_DURATION, time - task.start_time, time - task.start_time - task.duration);
+	}
+
 	update_task(task_id, task);
 }
 
