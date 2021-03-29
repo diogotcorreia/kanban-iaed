@@ -2,68 +2,55 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "activities.h"
+#include "proj1.h"
 
-static activity activities[MAX_ACTIVITIES];
-static int activity_count = 0;
-
-void setup_activities()
+void setup_activities(kanban *global_store)
 {
-	add_activity(ACTIVITY_TODO);
-	add_activity(ACTIVITY_IN_PROGRESS);
-	add_activity(ACTIVITY_DONE);
+	add_activity(global_store, ACTIVITY_TODO);
+	add_activity(global_store, ACTIVITY_IN_PROGRESS);
+	add_activity(global_store, ACTIVITY_DONE);
 }
 
-activity get_activity(int index)
+char *get_activity(kanban *global_store, int index)
 {
-	return activities[index];
+	return global_store->activities[index];
 }
 
 /**
  * Adiciona uma atividade ao sistema.
- * Retorna a estrutura que representa a nova atividade.
- * Caso o sistema tenha atingido o número máximo de atividades, retorna
- * uma atividade cujo status é -1.
- * Caso já exista uma atividade com o mesmo nome, retorna uma atividade
- * cujo status é -2.
- * Caso o nome seja inválido (isto é, não seja apenas maiúsculas e whitespace),
- * retorna uma atividade cujo status é -3.
+ * Retorna 0 caso a atividade seja criada com sucesso.
+ * Caso o sistema tenha atingido o número máximo de atividades, retorna -1.
+ * Caso já exista uma atividade com o mesmo nome, retorna -2.
+ * Caso o nome seja inválido (isto é, não seja apenas maiúsculas e whitespace), retorna -3.
  */
-activity add_activity(char name[MAX_ACTIVITY_NAME_LENGTH])
+int add_activity(kanban *global_store, char name[MAX_ACTIVITY_NAME_LENGTH])
 {
-	activity new_activity;
-
 	/* verificação de argumentos */
-	if (activity_count == MAX_ACTIVITIES)
+	if (global_store->activities_count == MAX_ACTIVITIES)
 	{
-		new_activity.status = -1;
-		return new_activity;
+		return -1;
 	}
-	if (get_activity_id(name) >= 0)
+	if (get_activity_id(global_store, name) >= 0)
 	{
-		new_activity.status = -2;
-		return new_activity;
+		return -2;
 	}
 	if (is_invalid_activity_name(name))
 	{
-		new_activity.status = -3;
-		return new_activity;
+		return -3;
 	}
 
-	strcpy(new_activity.name, name);
-	new_activity.status = 0;
-	activities[activity_count++] = new_activity;
+	strcpy(global_store->activities[global_store->activities_count++], name);
 
-	return new_activity;
+	return 0;
 }
 
 /* Retorna o índice se já existir uma atividade com este nome. Retorna -1 caso não exista. */
-int get_activity_id(char name[])
+int get_activity_id(kanban *global_store, char name[])
 {
 	int i;
-	for (i = 0; i < activity_count; ++i)
+	for (i = 0; i < global_store->activities_count; ++i)
 	{
-		if (strcmp(activities[i].name, name) == 0)
+		if (strcmp(global_store->activities[i], name) == 0)
 		{
 			return i;
 		}
@@ -90,11 +77,11 @@ int is_invalid_activity_name(char name[])
 	return 0;
 }
 
-void list_all_activities()
+void list_all_activities(kanban *global_store)
 {
 	int i;
-	for (i = 0; i < activity_count; ++i)
+	for (i = 0; i < global_store->activities_count; ++i)
 	{
-		printf(ACTIVITY_TO_STRING, activities[i].name);
+		printf(ACTIVITY_TO_STRING, global_store->activities[i]);
 	}
 }

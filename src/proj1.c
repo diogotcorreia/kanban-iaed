@@ -3,62 +3,42 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "activities.h"
-#include "tasks.h"
-#include "users.h"
-
-/* Recebe um comando do stdin, e redireciona para a função desejada */
-int handle_command();
-
-void handle_add_task_command();
-
-void handle_list_tasks_command();
-
-void handle_time_forward_command();
-
-void handle_users_command();
-
-void handle_move_command();
-
-void handle_list_by_activities_command();
-
-void handle_activities_command();
-
-static int time = 0;
+#include "proj1.h"
 
 int main()
 {
-	setup_activities();
-	while (handle_command())
+	kanban global_store = {0};
+	setup_activities(&global_store);
+	while (handle_command(&global_store))
 		;
 	return 0;
 }
 
-int handle_command()
+int handle_command(kanban *global_store)
 {
 	char c = getchar();
 	switch (c)
 	{
 	case 't':
-		handle_add_task_command();
+		handle_add_task_command(global_store);
 		return 1;
 	case 'l':
-		handle_list_tasks_command();
+		handle_list_tasks_command(global_store);
 		return 1;
 	case 'n':
-		handle_time_forward_command();
+		handle_time_forward_command(global_store);
 		return 1;
 	case 'u':
-		handle_users_command();
+		handle_users_command(global_store);
 		return 1;
 	case 'm':
-		handle_move_command();
+		handle_move_command(global_store);
 		return 1;
 	case 'd':
-		handle_list_by_activities_command();
+		handle_list_by_activities_command(global_store);
 		return 1;
 	case 'a':
-		handle_activities_command();
+		handle_activities_command(global_store);
 		return 1;
 	case 'q':
 		/* Sair do programa */
@@ -69,7 +49,7 @@ int handle_command()
 	}
 }
 
-void handle_add_task_command()
+void handle_add_task_command(kanban *global_store)
 {
 	int duration;
 	char description[MAX_DESCRIPTION_LENGTH];
@@ -78,8 +58,9 @@ void handle_add_task_command()
 	scanf("%d", &duration);
 	getchar(); /* consume space before description */
 	fgets(description, MAX_DESCRIPTION_LENGTH, stdin);
+	description[strcspn(description, "\n")] = 0; /* remover \n no final da string */
 
-	result_task = add_task(duration, description);
+	result_task = add_task(global_store, duration, description);
 
 	if (result_task.id == -1)
 	{
@@ -95,7 +76,7 @@ void handle_add_task_command()
 	}
 }
 
-void handle_list_tasks_command()
+void handle_list_tasks_command(kanban *global_store)
 {
 	int id = 0, all = 1;
 	char c;
@@ -106,7 +87,7 @@ void handle_list_tasks_command()
 		{
 			if (id != 0)
 			{
-				print_task_by_id(id);
+				print_task_by_id(global_store, id);
 			}
 			id = 0;
 		}
@@ -118,28 +99,27 @@ void handle_list_tasks_command()
 	}
 	if (id != 0)
 	{
-		print_task_by_id(id);
+		print_task_by_id(global_store, id);
 	}
 	if (all)
 	{
-		print_all_tasks();
+		print_all_tasks(global_store);
 	}
 }
 
-void handle_time_forward_command()
+void handle_time_forward_command(kanban *global_store)
 {
 	int increment;
 	scanf("%d", &increment);
-	time += increment;
-	printf("%d\n", time);
+	global_store->time += increment;
+	printf("%d\n", global_store->time);
 }
 
-void handle_users_command()
+void handle_users_command(kanban *global_store)
 {
 	char c;
-	int i = 0;
+	int i = 0, result;
 	char name[MAX_USER_NAME_LENGTH];
-	user new_user;
 
 	while ((c = getchar()) != EOF && c != '\n' && i < MAX_USER_NAME_LENGTH - 1)
 	{
@@ -152,8 +132,8 @@ void handle_users_command()
 
 	if (i)
 	{
-		new_user = add_user(name);
-		switch (new_user.status)
+		result = add_user(global_store, name);
+		switch (result)
 		{
 		case -1:
 			printf(USER_ERR_TOO_MANY);
@@ -165,11 +145,11 @@ void handle_users_command()
 	}
 	else
 	{
-		list_all_users();
+		list_all_users(global_store);
 	}
 }
 
-void handle_move_command()
+void handle_move_command(kanban *global_store)
 {
 	task task;
 	int task_id, user_id, activity_id;
@@ -183,9 +163,9 @@ void handle_move_command()
 	fgets(activity, MAX_ACTIVITY_NAME_LENGTH, stdin);
 	activity[strcspn(activity, "\n")] = 0; /* remover \n no final da string */
 
-	task = get_task(task_id);
-	user_id = get_user_id(user);
-	activity_id = get_activity_id(activity);
+	task = get_task(global_store, task_id);
+	user_id = get_user_id(global_store, user);
+	activity_id = get_activity_id(global_store, activity);
 
 	/* verificar condições e retornar erros */
 	if (task.id <= 0)
@@ -211,7 +191,7 @@ void handle_move_command()
 
 	if (task.activity == 0)
 	{
-		task.start_time = time;
+		task.start_time = global_store->time;
 	}
 
 	task.activity = activity_id;
@@ -219,13 +199,13 @@ void handle_move_command()
 
 	if (strcmp(activity, ACTIVITY_DONE) == 0)
 	{
-		printf(TASK_MOVE_DURATION, time - task.start_time, time - task.start_time - task.duration);
+		printf(TASK_MOVE_DURATION, global_store->time - task.start_time, global_store->time - task.start_time - task.duration);
 	}
 
-	update_task(task_id, task);
+	update_task(global_store, task_id, task);
 }
 
-void handle_list_by_activities_command()
+void handle_list_by_activities_command(kanban *global_store)
 {
 	char activity[MAX_ACTIVITY_NAME_LENGTH];
 	int activity_id, task_count, i;
@@ -236,7 +216,7 @@ void handle_list_by_activities_command()
 	fgets(activity, MAX_ACTIVITY_NAME_LENGTH, stdin);
 	activity[strcspn(activity, "\n")] = 0; /* remover \n no final da string */
 
-	activity_id = get_activity_id(activity);
+	activity_id = get_activity_id(global_store, activity);
 
 	if (activity_id < 0)
 	{
@@ -244,7 +224,7 @@ void handle_list_by_activities_command()
 		return;
 	}
 
-	task_count = get_tasks_by_activity(activity_id, activity_tasks);
+	task_count = get_tasks_by_activity(global_store, activity_id, activity_tasks);
 
 	for (i = 0; i < task_count; ++i)
 	{
@@ -253,12 +233,11 @@ void handle_list_by_activities_command()
 	}
 }
 
-void handle_activities_command()
+void handle_activities_command(kanban *global_store)
 {
 	char c;
-	int i = 0;
+	int i = 0, result;
 	char name[MAX_ACTIVITY_NAME_LENGTH];
-	activity new_activity;
 
 	while ((c = getchar()) != EOF && c != '\n' && i < MAX_ACTIVITY_NAME_LENGTH - 1)
 	{
@@ -271,8 +250,8 @@ void handle_activities_command()
 
 	if (i)
 	{
-		new_activity = add_activity(name);
-		switch (new_activity.status)
+		result = add_activity(global_store, name);
+		switch (result)
 		{
 		case -1:
 			printf(ACTIVITY_ERR_TOO_MANY);
@@ -287,6 +266,6 @@ void handle_activities_command()
 	}
 	else
 	{
-		list_all_activities();
+		list_all_activities(global_store);
 	}
 }

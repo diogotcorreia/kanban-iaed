@@ -2,54 +2,43 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "users.h"
+#include "proj1.h"
 
-static user users[MAX_USERS];
-static int user_count = 0;
-
-user get_user(int index)
+char *get_user(kanban *global_store, int index)
 {
-	return users[index];
+	return global_store->users[index];
 }
 
 /**
  * Adiciona um utilizador ao sistema.
- * Retorna a estrutura que representa o novo utilizador.
- * Caso o sistema tenha atingido o número máximo de utilizadores, retorna
- * um utilizador cujo status é -1.
- * Caso já exista um utilizador com o mesmo nome, retorna um utilizador
- * cujo status é -2.
+ * Retorna 0, caso o utilizador seja criado com sucesso.
+ * Caso o sistema tenha atingido o número máximo de utilizadores, retorna -1.
+ * Caso já exista um utilizador com o mesmo nome, retorna um utilizador -2.
  */
-user add_user(char name[])
+int add_user(kanban *global_store, char name[])
 {
-	user new_user;
-
 	/* verificação de argumentos */
-	if (user_count == MAX_USERS)
+	if (global_store->users_count == MAX_USERS)
 	{
-		new_user.status = -1;
-		return new_user;
+		return -1;
 	}
-	if (get_user_id(name) >= 0)
+	if (get_user_id(global_store, name) >= 0)
 	{
-		new_user.status = -2;
-		return new_user;
+		return -2;
 	}
 
-	strcpy(new_user.name, name);
-	new_user.status = 0;
-	users[user_count++] = new_user;
+	strcpy(global_store->users[global_store->users_count++], name);
 
-	return new_user;
+	return 0;
 }
 
 /* Retorna o índice se já existir um utilizador com este nome. Retorna -1 caso não exista. */
-int get_user_id(char name[])
+int get_user_id(kanban *global_store, char name[])
 {
 	int i;
-	for (i = 0; i < user_count; ++i)
+	for (i = 0; i < global_store->users_count; ++i)
 	{
-		if (strcmp(users[i].name, name) == 0)
+		if (strcmp(global_store->users[i], name) == 0)
 		{
 			return i;
 		}
@@ -57,11 +46,11 @@ int get_user_id(char name[])
 	return -1;
 }
 
-void list_all_users()
+void list_all_users(kanban *global_store)
 {
 	int i;
-	for (i = 0; i < user_count; ++i)
+	for (i = 0; i < global_store->users_count; ++i)
 	{
-		printf(USER_TO_STRING, users[i].name);
+		printf(USER_TO_STRING, global_store->users[i]);
 	}
 }

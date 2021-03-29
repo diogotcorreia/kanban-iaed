@@ -2,10 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "tasks.h"
-#include "activities.h"
-
-static task task_store[MAX_TASKS] = {{0}};
+#include "proj1.h"
 
 /**
  * Adiciona uma tarefa ao sistema.
@@ -15,33 +12,32 @@ static task task_store[MAX_TASKS] = {{0}};
  * Caso já exista uma tarefa com a mesma descrição, retorna uma tarefa
  * cujo ID é -2.
  */
-task add_task(int duration, char description[])
+task add_task(kanban *global_store, int duration, char description[])
 {
-	static int id = 0; /* guardar o ID da tarefa anterior */
 	task new_task;
-	if (id == MAX_TASKS)
+	if (global_store->tasks_count == MAX_TASKS)
 	{
 		task too_many_tasks = {-1, 0, "", 0, 0, -1};
 		return too_many_tasks;
 	}
-	if (is_duplicate_description(description, id))
+	if (is_duplicate_description(global_store, description))
 	{
 		task duplicate_task = {-2, 0, "", 0, 0, -1};
 		return duplicate_task;
 	}
-	new_task.id = id + 1;
+	new_task.id = global_store->tasks_count + 1;
 	new_task.duration = duration;
 	new_task.activity = 0;
 	new_task.start_time = 0;
 	new_task.user_id = -1;
 	strcpy(new_task.description, description);
 
-	task_store[id++] = new_task;
+	global_store->tasks[global_store->tasks_count++] = new_task;
 
 	return new_task;
 }
 
-task get_task(int id)
+task get_task(kanban *global_store, int id)
 {
 	task task;
 	if (id <= 0)
@@ -49,35 +45,36 @@ task get_task(int id)
 		task.id = 0;
 		return task;
 	}
-	return task_store[id - 1];
+	return global_store->tasks[id - 1];
 }
 
-int get_tasks_by_activity(int id, task tasks[])
+/* TODO remove this */
+int get_tasks_by_activity(kanban *global_store, int id, task tasks[])
 {
 	int i;
 	int j = 0;
-	for (i = 0; i < MAX_TASKS && task_store[i].id > 0; ++i)
+	for (i = 0; i < MAX_TASKS && global_store->tasks[i].id > 0; ++i)
 	{
-		if (task_store[i].activity == id)
+		if (global_store->tasks[i].activity == id)
 		{
-			tasks[j++] = task_store[i];
+			tasks[j++] = global_store->tasks[i];
 		}
 	}
 	return j;
 }
 
-void update_task(int id, task task)
+void update_task(kanban *global_store, int id, task task)
 {
-	task_store[id - 1] = task;
+	global_store->tasks[id - 1] = task;
 }
 
 /* Retorna 1 se já existir uma tarefa com esta descrição. Retorna 0 em caso contrário. */
-int is_duplicate_description(char description[], int tasks_size)
+int is_duplicate_description(kanban *global_store, char description[])
 {
 	int i;
-	for (i = 0; i < tasks_size; ++i)
+	for (i = 0; i < global_store->tasks_count; ++i)
 	{
-		if (strcmp(task_store[i].description, description) == 0)
+		if (strcmp(global_store->tasks[i].description, description) == 0)
 		{
 			return 1;
 		}
@@ -86,26 +83,23 @@ int is_duplicate_description(char description[], int tasks_size)
 }
 
 /* Imprime todas as tarefas, ordenadas pela sua descrição, para o stdout */
-void print_all_tasks()
+void print_all_tasks(kanban *global_store)
 {
 	/* TODO this should print the tasks ordered by description */
 	int i = 0;
 	task task;
-	activity activity;
-	while ((task = task_store[i++]).id > 0)
+	while ((task = global_store->tasks[i++]).id > 0)
 	{
-		activity = get_activity(task.activity);
-		printf(TASK_TO_STRING, task.id, activity.name, task.duration, task.description);
+		printf(TASK_TO_STRING, task.id, get_activity(global_store, task.activity), task.duration, task.description);
 	}
 }
 
-void print_task_by_id(int id)
+void print_task_by_id(kanban *global_store, int id)
 {
-	task task = task_store[id - 1];
+	task task = global_store->tasks[id - 1];
 	if (task.id > 0)
 	{
-		activity activity = get_activity(task.activity);
-		printf(TASK_TO_STRING, task.id, activity.name, task.duration, task.description);
+		printf(TASK_TO_STRING, task.id, get_activity(global_store, task.activity), task.duration, task.description);
 	}
 	else
 	{
