@@ -39,6 +39,22 @@ task add_task(int duration, char description[])
 	return new_task;
 }
 
+task get_task(int id)
+{
+	task task;
+	if (id <= 0)
+	{
+		task.id = 0;
+		return task;
+	}
+	return task_store[id - 1];
+}
+
+void update_task(int id, task task)
+{
+	task_store[id - 1] = task;
+}
+
 /* Retorna 1 se já existir uma tarefa com esta descrição. Retorna 0 em caso contrário. */
 int is_duplicate_description(char description[], int tasks_size)
 {

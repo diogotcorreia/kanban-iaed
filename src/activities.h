@@ -25,7 +25,7 @@ activity get_activity(int index);
 
 activity add_activity(char name[MAX_ACTIVITY_NAME_LENGTH]);
 
-int is_duplicate_activity_name(char name[]);
+int get_activity_id(char name[]);
 
 int is_invalid_activity_name(char name[]);
 

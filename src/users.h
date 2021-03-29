@@ -18,7 +18,7 @@ user get_user(int index);
 
 user add_user(char name[]);
 
-int is_duplicate_user(char name[]);
+int get_user_id(char name[]);
 
 void list_all_users();
 

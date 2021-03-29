@@ -30,7 +30,7 @@ user add_user(char name[])
 		new_user.status = -1;
 		return new_user;
 	}
-	if (is_duplicate_user(name))
+	if (get_user_id(name) >= 0)
 	{
 		new_user.status = -2;
 		return new_user;
@@ -43,18 +43,18 @@ user add_user(char name[])
 	return new_user;
 }
 
-/* Retorna 1 se já existir um utilizador com este nome. Retorna 0 em caso contrário. */
-int is_duplicate_user(char name[])
+/* Retorna o índice se já existir um utilizador com este nome. Retorna -1 caso não exista. */
+int get_user_id(char name[])
 {
 	int i;
 	for (i = 0; i < user_count; ++i)
 	{
 		if (strcmp(users[i].name, name) == 0)
 		{
-			return 1;
+			return i;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 void list_all_users()

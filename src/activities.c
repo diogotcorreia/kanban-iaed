@@ -39,7 +39,7 @@ activity add_activity(char name[MAX_ACTIVITY_NAME_LENGTH])
 		new_activity.status = -1;
 		return new_activity;
 	}
-	if (is_duplicate_activity_name(name))
+	if (get_activity_id(name) >= 0)
 	{
 		new_activity.status = -2;
 		return new_activity;
@@ -57,18 +57,18 @@ activity add_activity(char name[MAX_ACTIVITY_NAME_LENGTH])
 	return new_activity;
 }
 
-/* Retorna 1 se já existir uma atividade com este nome. Retorna 0 em caso contrário. */
-int is_duplicate_activity_name(char name[])
+/* Retorna o índice se já existir uma atividade com este nome. Retorna -1 caso não exista. */
+int get_activity_id(char name[])
 {
 	int i;
 	for (i = 0; i < activity_count; ++i)
 	{
 		if (strcmp(activities[i].name, name) == 0)
 		{
-			return 1;
+			return i;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 int is_invalid_activity_name(char name[])

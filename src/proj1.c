@@ -1,6 +1,7 @@
 /* Diogo Correia - ist199211 */
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 #include "activities.h"
 #include "tasks.h"
@@ -16,6 +17,8 @@ void handle_list_tasks_command();
 void handle_time_forward_command();
 
 void handle_users_command();
+
+void handle_move_command();
 
 void handle_activities_command();
 
@@ -45,6 +48,9 @@ int handle_command()
 		return 1;
 	case 'u':
 		handle_users_command();
+		return 1;
+	case 'm':
+		handle_move_command();
 		return 1;
 	case 'a':
 		handle_activities_command();
@@ -156,6 +162,50 @@ void handle_users_command()
 	{
 		list_all_users();
 	}
+}
+
+void handle_move_command()
+{
+	task task;
+	int task_id, user_id, activity_id;
+	char user[MAX_USER_NAME_LENGTH];
+	char activity[MAX_ACTIVITY_NAME_LENGTH];
+
+	scanf("%d", &task_id);
+	scanf("%s", user);
+
+	getchar(); /* read space after user */
+	fgets(activity, MAX_ACTIVITY_NAME_LENGTH, stdin);
+	activity[strcspn(activity, "\n")] = 0; /* remover \n no final da string */
+
+	task = get_task(task_id);
+	user_id = get_user_id(user);
+	activity_id = get_activity_id(activity);
+
+	/* verificar condições e retornar erros */
+	if (task.id <= 0)
+	{
+		printf(TASK_MOVE_ERR_NO_SUCH_TASK);
+		return;
+	}
+	else if (strcmp(activity, ACTIVITY_TODO) == 0)
+	{
+		printf(TASK_MOVE_ERR_ALREADY_STARTED);
+		return;
+	}
+	else if (user_id < 0)
+	{
+		printf(TASK_MOVE_ERR_NO_SUCH_USER);
+		return;
+	}
+	else if (activity_id < 0)
+	{
+		printf(TASK_MOVE_ERR_NO_SUCH_ACTIVITY);
+		return;
+	}
+
+	task.activity = activity_id;
+	update_task(task_id, task);
 }
 
 void handle_activities_command()

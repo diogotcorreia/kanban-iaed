@@ -10,6 +10,11 @@
 #define TASK_ERR_DUPLICATE_DESCRIPTION "duplicate description\n"
 #define TASK_ERR_NO_SUCH_TASK "%d: no such task\n"
 
+#define TASK_MOVE_ERR_NO_SUCH_TASK "no such task\n"
+#define TASK_MOVE_ERR_ALREADY_STARTED "task already started\n"
+#define TASK_MOVE_ERR_NO_SUCH_USER "no such user\n"
+#define TASK_MOVE_ERR_NO_SUCH_ACTIVITY "no such activity\n"
+
 typedef struct
 {
 	short id; /* irá ser sempre o índice na array + 1, ou zero caso não exista */
@@ -19,6 +24,10 @@ typedef struct
 } task;
 
 task add_task(int duration, char description[]);
+
+task get_task(int id);
+
+void update_task(int id, task task);
 
 int is_duplicate_description(char description[], int tasks_size);
 
