@@ -4,6 +4,7 @@
 
 #include "activities.h"
 #include "tasks.h"
+#include "users.h"
 
 /* Recebe um comando do stdin, e redireciona para a função desejada */
 int handle_command();
@@ -13,6 +14,8 @@ void handle_add_task_command();
 void handle_list_tasks_command();
 
 void handle_time_forward_command();
+
+void handle_users_command();
 
 void handle_activities_command();
 
@@ -39,6 +42,9 @@ int handle_command()
 		return 1;
 	case 'n':
 		handle_time_forward_command();
+		return 1;
+	case 'u':
+		handle_users_command();
 		return 1;
 	case 'a':
 		handle_activities_command();
@@ -115,6 +121,41 @@ void handle_time_forward_command()
 	scanf("%d", &increment);
 	time += increment;
 	printf("%d\n", time);
+}
+
+void handle_users_command()
+{
+	char c;
+	int i = 0;
+	char name[MAX_USER_NAME_LENGTH];
+	user new_user;
+
+	while ((c = getchar()) != EOF && c != '\n' && i < MAX_USER_NAME_LENGTH - 1)
+	{
+		if (!isspace(c))
+		{
+			name[i++] = c;
+		}
+	}
+	name[i] = '\0';
+
+	if (i)
+	{
+		new_user = add_user(name);
+		switch (new_user.status)
+		{
+		case -1:
+			printf(USER_ERR_TOO_MANY);
+			break;
+		case -2:
+			printf(USER_ERR_DUPLICATE);
+			break;
+		}
+	}
+	else
+	{
+		list_all_users();
+	}
 }
 
 void handle_activities_command()

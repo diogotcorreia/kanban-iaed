@@ -57,7 +57,7 @@ activity add_activity(char name[MAX_ACTIVITY_NAME_LENGTH])
 	return new_activity;
 }
 
-/* Retorna 1 se já existir uma tarefa com esta descrição. Retorna 0 em caso contrário. */
+/* Retorna 1 se já existir uma atividade com este nome. Retorna 0 em caso contrário. */
 int is_duplicate_activity_name(char name[])
 {
 	int i;
