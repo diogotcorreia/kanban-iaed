@@ -20,6 +20,8 @@ void handle_users_command();
 
 void handle_move_command();
 
+void handle_list_by_activities_command();
+
 void handle_activities_command();
 
 static int time = 0;
@@ -51,6 +53,9 @@ int handle_command()
 		return 1;
 	case 'm':
 		handle_move_command();
+		return 1;
+	case 'd':
+		handle_list_by_activities_command();
 		return 1;
 	case 'a':
 		handle_activities_command();
@@ -218,6 +223,34 @@ void handle_move_command()
 	}
 
 	update_task(task_id, task);
+}
+
+void handle_list_by_activities_command()
+{
+	char activity[MAX_ACTIVITY_NAME_LENGTH];
+	int activity_id, task_count, i;
+	task activity_tasks[MAX_TASKS];
+	task task;
+
+	getchar(); /* read space after command */
+	fgets(activity, MAX_ACTIVITY_NAME_LENGTH, stdin);
+	activity[strcspn(activity, "\n")] = 0; /* remover \n no final da string */
+
+	activity_id = get_activity_id(activity);
+
+	if (activity_id < 0)
+	{
+		printf(TASK_BY_ACTIVITY_ERR_NO_SUCH_ACTIVITY);
+		return;
+	}
+
+	task_count = get_tasks_by_activity(activity_id, activity_tasks);
+
+	for (i = 0; i < task_count; ++i)
+	{
+		task = activity_tasks[i];
+		printf(TASK_BY_ACTIVITY_TO_STR, task.id, task.start_time, task.description);
+	}
 }
 
 void handle_activities_command()

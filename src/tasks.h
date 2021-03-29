@@ -16,6 +16,9 @@
 #define TASK_MOVE_ERR_NO_SUCH_ACTIVITY "no such activity\n"
 #define TASK_MOVE_DURATION "duration=%d slack=%d\n"
 
+#define TASK_BY_ACTIVITY_ERR_NO_SUCH_ACTIVITY "no such activity\n"
+#define TASK_BY_ACTIVITY_TO_STR "%d %d %s"
+
 typedef struct
 {
 	short id; /* irá ser sempre o índice na array + 1, ou zero caso não exista */
@@ -29,6 +32,8 @@ typedef struct
 task add_task(int duration, char description[]);
 
 task get_task(int id);
+
+int get_tasks_by_activity(int id, task tasks[]);
 
 void update_task(int id, task task);
 

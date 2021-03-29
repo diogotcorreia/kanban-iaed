@@ -21,18 +21,18 @@ task add_task(int duration, char description[])
 	task new_task;
 	if (id == MAX_TASKS)
 	{
-		task too_many_tasks = {-1, 0, "", 0, -1, -1};
+		task too_many_tasks = {-1, 0, "", 0, 0, -1};
 		return too_many_tasks;
 	}
 	if (is_duplicate_description(description, id))
 	{
-		task duplicate_task = {-2, 0, "", 0, -1, -1};
+		task duplicate_task = {-2, 0, "", 0, 0, -1};
 		return duplicate_task;
 	}
 	new_task.id = id + 1;
 	new_task.duration = duration;
 	new_task.activity = 0;
-	new_task.start_time = -1;
+	new_task.start_time = 0;
 	new_task.user_id = -1;
 	strcpy(new_task.description, description);
 
@@ -50,6 +50,20 @@ task get_task(int id)
 		return task;
 	}
 	return task_store[id - 1];
+}
+
+int get_tasks_by_activity(int id, task tasks[])
+{
+	int i;
+	int j = 0;
+	for (i = 0; i < MAX_TASKS && task_store[i].id > 0; ++i)
+	{
+		if (task_store[i].activity == id)
+		{
+			tasks[j++] = task_store[i];
+		}
+	}
+	return j;
 }
 
 void update_task(int id, task task)
