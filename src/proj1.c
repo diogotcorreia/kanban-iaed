@@ -12,7 +12,11 @@ void handle_add_task_command();
 
 void handle_list_tasks_command();
 
+void handle_time_forward_command();
+
 void handle_activities_command();
+
+static int time = 0;
 
 int main()
 {
@@ -33,13 +37,18 @@ int handle_command()
 	case 'l':
 		handle_list_tasks_command();
 		return 1;
+	case 'n':
+		handle_time_forward_command();
+		return 1;
 	case 'a':
 		handle_activities_command();
 		return 1;
 	case 'q':
-	default:
 		/* Sair do programa */
 		return 0;
+	default:
+		/* Ignorar comandos desconhecidos */
+		return 1;
 	}
 }
 
@@ -98,6 +107,14 @@ void handle_list_tasks_command()
 	{
 		print_all_tasks();
 	}
+}
+
+void handle_time_forward_command()
+{
+	int increment;
+	scanf("%d", &increment);
+	time += increment;
+	printf("%d\n", time);
 }
 
 void handle_activities_command()
