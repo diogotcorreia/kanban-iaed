@@ -34,6 +34,8 @@ task add_task(kanban *global_store, int duration, char description[])
 
 	global_store->tasks[global_store->tasks_count++] = new_task;
 
+	insert_task_sorted(global_store, &global_store->tasks[global_store->tasks_count - 1]);
+
 	return new_task;
 }
 
@@ -46,6 +48,37 @@ task get_task(kanban *global_store, int id)
 		return task;
 	}
 	return global_store->tasks[id - 1];
+}
+
+void insert_task_sorted(kanban *global_store, task *task)
+{
+	int l = 0;
+	int h = global_store->tasks_count - 1;
+	int i, m = 0, cmp = -1;
+
+	while (l < h && cmp != 0)
+	{
+		m = (l + h) / 2;
+		cmp = strcmp(task->description, global_store->tasks[m].description);
+		if (cmp < 0)
+		{
+			h = m;
+		}
+		else if (cmp > 0)
+		{
+			l = m + 1;
+		}
+	}
+
+	if (cmp > 0)
+	{
+		++m;
+	}
+
+	for (i = global_store->tasks_count - 1; i >= m; --i)
+		global_store->tasks_sorted_desc[i] = global_store->tasks_sorted_desc[i - 1];
+
+	global_store->tasks_sorted_desc[m] = task;
 }
 
 /* TODO remove this */
@@ -85,12 +118,12 @@ int is_duplicate_description(kanban *global_store, char description[])
 /* Imprime todas as tarefas, ordenadas pela sua descrição, para o stdout */
 void print_all_tasks(kanban *global_store)
 {
-	/* TODO this should print the tasks ordered by description */
-	int i = 0;
-	task task;
-	while ((task = global_store->tasks[i++]).id > 0)
+	int i;
+	task *task;
+	for (i = 0; i < global_store->tasks_count; ++i)
 	{
-		printf(TASK_TO_STRING, task.id, get_activity(global_store, task.activity), task.duration, task.description);
+		task = global_store->tasks_sorted_desc[i];
+		printf(TASK_TO_STRING, task->id, get_activity(global_store, task->activity), task->duration, task->description);
 	}
 }
 

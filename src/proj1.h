@@ -92,6 +92,8 @@ task add_task(kanban *global_store, int duration, char description[]);
 
 task get_task(kanban *global_store, int id);
 
+void insert_task_sorted(kanban *global_store, task *task);
+
 int get_tasks_by_activity(kanban *global_store, int id, task tasks[]);
 
 void update_task(kanban *global_store, int id, task task);
