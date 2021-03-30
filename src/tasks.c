@@ -53,26 +53,19 @@ task get_task(kanban *global_store, int id)
 void insert_task_sorted(kanban *global_store, task *task)
 {
 	int l = 0;
-	int h = global_store->tasks_count - 1;
-	int i, m = 0, cmp = -1;
+	int h = global_store->tasks_count - 2;
+	int i, m = 0, cmp;
 
-	while (l < h && cmp != 0)
+	while (l <= h)
 	{
 		m = (l + h) / 2;
-		cmp = strcmp(task->description, global_store->tasks[m].description);
-		if (cmp < 0)
-		{
-			h = m;
-		}
+		cmp = strcmp(global_store->tasks_sorted_desc[m]->description, task->description);
+		if (cmp == 0)
+			break;
 		else if (cmp > 0)
-		{
-			l = m + 1;
-		}
-	}
-
-	if (cmp > 0)
-	{
-		++m;
+			h = m - 1;
+		else if (cmp < 0)
+			l = ++m;
 	}
 
 	for (i = global_store->tasks_count - 1; i >= m; --i)
