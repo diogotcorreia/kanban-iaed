@@ -94,7 +94,7 @@ task *get_task(kanban *global_store, int id);
 
 void insert_task_sorted(kanban *global_store, task *task);
 
-void insert_task_sorted_time(kanban *global_store, task *task);
+void insert_task_sorted_time(kanban *global_store, task *task, int new_time);
 
 void update_task(kanban *global_store, int id, task task);
 

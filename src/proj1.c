@@ -198,8 +198,8 @@ void handle_move_command(kanban *global_store)
 
 	if (task->activity == 0)
 	{
+		insert_task_sorted_time(global_store, task, global_store->time);
 		task->start_time = global_store->time;
-		insert_task_sorted_time(global_store, task);
 	}
 
 	task->activity = activity_id;

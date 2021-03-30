@@ -35,7 +35,7 @@ task add_task(kanban *global_store, int duration, char description[])
 	global_store->tasks[global_store->tasks_count] = new_task;
 
 	insert_task_sorted(global_store, &global_store->tasks[global_store->tasks_count]);
-	insert_task_sorted_time(global_store, &global_store->tasks[global_store->tasks_count]);
+	insert_task_sorted_time(global_store, &global_store->tasks[global_store->tasks_count], 0);
 
 	++global_store->tasks_count;
 
@@ -75,7 +75,7 @@ void insert_task_sorted(kanban *global_store, task *task)
 	global_store->tasks_sorted_desc[m] = task;
 }
 
-void insert_task_sorted_time(kanban *global_store, task *task)
+void insert_task_sorted_time(kanban *global_store, task *task, int new_time)
 {
 	int l = 0;
 	int h = global_store->tasks_count - 1;
@@ -84,7 +84,7 @@ void insert_task_sorted_time(kanban *global_store, task *task)
 	while (l <= h)
 	{
 		m = (l + h) / 2;
-		cmp = global_store->tasks_sorted_time[m]->start_time - task->start_time;
+		cmp = global_store->tasks_sorted_time[m]->start_time - new_time;
 		if (cmp == 0)
 			cmp = strcmp(global_store->tasks_sorted_time[m]->description, task->description);
 		if (cmp == 0)
