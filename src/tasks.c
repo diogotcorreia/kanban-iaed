@@ -32,28 +32,29 @@ task add_task(kanban *global_store, int duration, char description[])
 	new_task.user_id = -1;
 	strcpy(new_task.description, description);
 
-	global_store->tasks[global_store->tasks_count++] = new_task;
+	global_store->tasks[global_store->tasks_count] = new_task;
 
-	insert_task_sorted(global_store, &global_store->tasks[global_store->tasks_count - 1]);
+	insert_task_sorted(global_store, &global_store->tasks[global_store->tasks_count]);
+	insert_task_sorted_time(global_store, &global_store->tasks[global_store->tasks_count]);
+
+	++global_store->tasks_count;
 
 	return new_task;
 }
 
-task get_task(kanban *global_store, int id)
+task *get_task(kanban *global_store, int id)
 {
-	task task;
-	if (id <= 0)
+	if (id <= 0 || id > global_store->tasks_count)
 	{
-		task.id = 0;
-		return task;
+		return 0;
 	}
-	return global_store->tasks[id - 1];
+	return &global_store->tasks[id - 1];
 }
 
 void insert_task_sorted(kanban *global_store, task *task)
 {
 	int l = 0;
-	int h = global_store->tasks_count - 2;
+	int h = global_store->tasks_count - 1;
 	int i, m = 0, cmp;
 
 	while (l <= h)
@@ -68,25 +69,49 @@ void insert_task_sorted(kanban *global_store, task *task)
 			l = ++m;
 	}
 
-	for (i = global_store->tasks_count - 1; i >= m; --i)
+	for (i = global_store->tasks_count; i >= m; --i)
 		global_store->tasks_sorted_desc[i] = global_store->tasks_sorted_desc[i - 1];
 
 	global_store->tasks_sorted_desc[m] = task;
 }
 
-/* TODO remove this */
-int get_tasks_by_activity(kanban *global_store, int id, task tasks[])
+void insert_task_sorted_time(kanban *global_store, task *task)
 {
-	int i;
-	int j = 0;
-	for (i = 0; i < MAX_TASKS && global_store->tasks[i].id > 0; ++i)
+	int l = 0;
+	int h = global_store->tasks_count - 1;
+	int i, m = 0, cmp;
+
+	while (l <= h)
 	{
-		if (global_store->tasks[i].activity == id)
+		m = (l + h) / 2;
+		cmp = global_store->tasks_sorted_time[m]->start_time - task->start_time;
+		if (cmp == 0)
+			cmp = strcmp(global_store->tasks_sorted_time[m]->description, task->description);
+		if (cmp == 0)
+			break;
+		else if (cmp > 0)
+			h = m - 1;
+		else if (cmp < 0)
+			l = ++m;
+	}
+
+	for (i = 0, l = 0; i < global_store->tasks_count - 1; ++i)
+	{
+		if (l)
 		{
-			tasks[j++] = global_store->tasks[i];
+			global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i + 1];
+		}
+		else if (task == global_store->tasks_sorted_time[i])
+		{
+			l = 1;
+			global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i + 1];
 		}
 	}
-	return j;
+
+	for (i = global_store->tasks_count; i >= m; --i)
+		global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i - 1];
+
+	global_store->tasks_sorted_time[m - l] = task;
 }
 
 void update_task(kanban *global_store, int id, task task)

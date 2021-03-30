@@ -158,7 +158,7 @@ void handle_users_command(kanban *global_store)
 
 void handle_move_command(kanban *global_store)
 {
-	task task;
+	task *task;
 	int task_id, user_id, activity_id;
 	char user[MAX_USER_NAME_LENGTH];
 	char activity[MAX_ACTIVITY_NAME_LENGTH];
@@ -175,7 +175,7 @@ void handle_move_command(kanban *global_store)
 	activity_id = get_activity_id(global_store, activity);
 
 	/* verificar condições e retornar erros */
-	if (task.id <= 0)
+	if (task == 0 || task->id == 0)
 	{
 		printf(TASK_MOVE_ERR_NO_SUCH_TASK);
 		return;
@@ -196,28 +196,26 @@ void handle_move_command(kanban *global_store)
 		return;
 	}
 
-	if (task.activity == 0)
+	if (task->activity == 0)
 	{
-		task.start_time = global_store->time;
+		task->start_time = global_store->time;
+		insert_task_sorted_time(global_store, task);
 	}
 
-	task.activity = activity_id;
-	task.user_id = user_id;
+	task->activity = activity_id;
+	task->user_id = user_id;
 
 	if (strcmp(activity, ACTIVITY_DONE) == 0)
 	{
-		printf(TASK_MOVE_DURATION, global_store->time - task.start_time, global_store->time - task.start_time - task.duration);
+		printf(TASK_MOVE_DURATION, global_store->time - task->start_time, global_store->time - task->start_time - task->duration);
 	}
-
-	update_task(global_store, task_id, task);
 }
 
 void handle_list_by_activities_command(kanban *global_store)
 {
 	char activity[MAX_ACTIVITY_NAME_LENGTH];
-	int activity_id, task_count, i;
-	task activity_tasks[MAX_TASKS];
-	task task;
+	int activity_id, i;
+	task *task;
 
 	getchar(); /* read space after command */
 	fgets(activity, MAX_ACTIVITY_NAME_LENGTH, stdin);
@@ -231,12 +229,13 @@ void handle_list_by_activities_command(kanban *global_store)
 		return;
 	}
 
-	task_count = get_tasks_by_activity(global_store, activity_id, activity_tasks);
-
-	for (i = 0; i < task_count; ++i)
+	for (i = 0; i < global_store->tasks_count; ++i)
 	{
-		task = activity_tasks[i];
-		printf(TASK_BY_ACTIVITY_TO_STR, task.id, task.start_time, task.description);
+		task = global_store->tasks_sorted_time[i];
+		if (task->activity == activity_id)
+		{
+			printf(TASK_BY_ACTIVITY_TO_STR, task->id, task->start_time, task->description);
+		}
 	}
 }
 
