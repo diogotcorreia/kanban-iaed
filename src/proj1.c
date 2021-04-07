@@ -190,9 +190,12 @@ void handle_move_command(kanban *global_store)
 		printf(TASK_MOVE_ERR_NO_SUCH_TASK);
 		return;
 	}
-	else if (strcmp(activity, ACTIVITY_TODO) == 0 && task->activity != ACTIVITY_TODO_ID)
+	else if (strcmp(activity, ACTIVITY_TODO) == 0)
 	{
-		printf(TASK_MOVE_ERR_ALREADY_STARTED);
+		if (task->activity != ACTIVITY_TODO_ID)
+		{
+			printf(TASK_MOVE_ERR_ALREADY_STARTED);
+		}
 		return;
 	}
 	else if (user_id < 0)
