@@ -56,3 +56,4 @@ dkms.conf
 
 # Output
 src/proj1
+*.zip
