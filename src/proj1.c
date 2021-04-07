@@ -51,9 +51,8 @@ int handle_command(kanban *global_store)
 
 void handle_add_task_command(kanban *global_store)
 {
-	int duration;
+	int duration, result_task;
 	char description[MAX_DESCRIPTION_LENGTH];
-	task result_task;
 
 	scanf("%d", &duration);
 	getchar(); /* consume space before description */
@@ -62,17 +61,21 @@ void handle_add_task_command(kanban *global_store)
 
 	result_task = add_task(global_store, duration, description);
 
-	if (result_task.id == -1)
+	if (result_task == -1)
 	{
 		printf(TASK_ERR_TOO_MANY_TASKS);
 	}
-	else if (result_task.id == -2)
+	else if (result_task == -2)
 	{
 		printf(TASK_ERR_DUPLICATE_DESCRIPTION);
 	}
+	else if (result_task == -3)
+	{
+		printf(TASK_ERR_INVALID_DURATION);
+	}
 	else
 	{
-		printf(TASK_ADD_SUCCESS, result_task.id);
+		printf(TASK_ADD_SUCCESS, result_task);
 	}
 }
 

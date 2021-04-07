@@ -6,24 +6,25 @@
 
 /**
  * Adiciona uma tarefa ao sistema.
- * Retorna a estrutura que representa a nova tarefa.
- * Caso o sistema tenha atingido o número máximo de tarefas, retorna
- * uma tarefa cujo ID é -1.
- * Caso já exista uma tarefa com a mesma descrição, retorna uma tarefa
- * cujo ID é -2.
+ * Retorna o id que representa a nova tarefa.
+ * Caso o sistema tenha atingido o número máximo de tarefas, retorna -1.
+ * Caso já exista uma tarefa com a mesma descrição, retorna uma tarefa -2.
+ * Caso a duração dada seja negativa, retorna -3.
  */
-task add_task(kanban *global_store, int duration, char description[])
+int add_task(kanban *global_store, int duration, char description[])
 {
 	task new_task;
 	if (global_store->tasks_count == MAX_TASKS)
 	{
-		task too_many_tasks = {-1, 0, "", 0, 0, -1};
-		return too_many_tasks;
+		return -1;
 	}
 	if (is_duplicate_description(global_store, description))
 	{
-		task duplicate_task = {-2, 0, "", 0, 0, -1};
-		return duplicate_task;
+		return -2;
+	}
+	if (duration <= 0)
+	{
+		return -3;
 	}
 	new_task.id = global_store->tasks_count + 1;
 	new_task.duration = duration;
@@ -39,7 +40,7 @@ task add_task(kanban *global_store, int duration, char description[])
 
 	++global_store->tasks_count;
 
-	return new_task;
+	return new_task.id;
 }
 
 task *get_task(kanban *global_store, int id)

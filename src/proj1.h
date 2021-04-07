@@ -12,6 +12,7 @@
 #define TASK_TO_STRING "%d %s #%d %s\n"
 #define TASK_ERR_TOO_MANY_TASKS "too many tasks\n"
 #define TASK_ERR_DUPLICATE_DESCRIPTION "duplicate description\n"
+#define TASK_ERR_INVALID_DURATION "invalid duration\n"
 #define TASK_ERR_NO_SUCH_TASK "%d: no such task\n"
 
 #define TASK_MOVE_ERR_NO_SUCH_TASK "no such task\n"
@@ -88,7 +89,7 @@ void handle_activities_command(kanban *global_store);
 
 /* tasks.c */
 
-task add_task(kanban *global_store, int duration, char description[]);
+int add_task(kanban *global_store, int duration, char description[]);
 
 task *get_task(kanban *global_store, int id);
 
