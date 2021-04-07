@@ -81,28 +81,35 @@ void handle_add_task_command(kanban *global_store)
 
 void handle_list_tasks_command(kanban *global_store)
 {
-	int id = 0, all = 1;
+	int id = 0, all = 1, neg = 0, read = 0;
 	char c;
 
 	while ((c = getchar()) != EOF && c != '\n')
 	{
-		if (c < '0' || c > '9')
+		if (c == '-')
 		{
-			if (id != 0)
+			neg = 1;
+		}
+		else if (c < '0' || c > '9')
+		{
+			if (read != 0)
 			{
-				print_task_by_id(global_store, id);
+				print_task_by_id(global_store, neg ? -id : id);
 			}
 			id = 0;
+			neg = 0;
+			read = 0;
 		}
 		else
 		{
 			id = id * 10 + c - '0';
 			all = 0;
+			read = 1;
 		}
 	}
-	if (id != 0)
+	if (read != 0)
 	{
-		print_task_by_id(global_store, id);
+		print_task_by_id(global_store, neg ? -id : id);
 	}
 	if (all)
 	{
