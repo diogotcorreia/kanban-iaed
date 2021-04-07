@@ -206,19 +206,19 @@ void handle_move_command(kanban *global_store)
 		return;
 	}
 
-	if (task->activity == 0)
+	if (task->activity == ACTIVITY_TODO_ID)
 	{
 		insert_task_sorted_time(global_store, task, global_store->time);
 		task->start_time = global_store->time;
 	}
 
-	task->activity = activity_id;
-	task->user_id = user_id;
-
-	if (strcmp(activity, ACTIVITY_DONE) == 0)
+	if (activity_id == ACTIVITY_DONE_ID && task->activity != ACTIVITY_DONE_ID)
 	{
 		printf(TASK_MOVE_DURATION, global_store->time - task->start_time, global_store->time - task->start_time - task->duration);
 	}
+
+	task->activity = activity_id;
+	task->user_id = user_id;
 }
 
 void handle_list_by_activities_command(kanban *global_store)

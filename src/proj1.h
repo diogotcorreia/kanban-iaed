@@ -32,6 +32,8 @@
 #define ACTIVITY_TODO "TO DO"
 #define ACTIVITY_IN_PROGRESS "IN PROGRESS"
 #define ACTIVITY_DONE "DONE"
+#define ACTIVITY_TODO_ID 0
+#define ACTIVITY_DONE_ID 2
 
 #define ACTIVITY_TO_STRING "%s\n"
 #define ACTIVITY_ERR_TOO_MANY "too many activities\n"
