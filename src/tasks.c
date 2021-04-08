@@ -52,22 +52,23 @@ task *get_task(kanban *global_store, int id)
 	return &global_store->tasks[id - 1];
 }
 
+int task_description_cmp(const task *a, const task_cmp *b)
+{
+	return strcmp(a->description, b->description);
+}
+
 void insert_task_sorted(kanban *global_store, task *task)
 {
-	int l = 0;
-	int h = global_store->tasks_count - 1;
-	int i, m = 0, cmp;
+	int m, i;
+	task_cmp task_cmp;
 
-	while (l <= h)
+	task_cmp.description = task->description;
+
+	m = binary_search(&task_cmp, global_store->tasks_sorted_desc, global_store->tasks_count, task_description_cmp);
+
+	if (m < 0)
 	{
-		m = (l + h) / 2;
-		cmp = strcmp(global_store->tasks_sorted_desc[m]->description, task->description);
-		if (cmp == 0)
-			break;
-		else if (cmp > 0)
-			h = m - 1;
-		else if (cmp < 0)
-			l = ++m;
+		m = -m - 1;
 	}
 
 	for (i = global_store->tasks_count; i >= m; --i)
@@ -76,35 +77,41 @@ void insert_task_sorted(kanban *global_store, task *task)
 	global_store->tasks_sorted_desc[m] = task;
 }
 
+int task_time_cmp(const task *a, const task_cmp *b)
+{
+	int cmp;
+	cmp = a->start_time - *b->time;
+	if (cmp == 0)
+	{
+		cmp = strcmp(a->description, b->description);
+	}
+	return cmp;
+}
+
 void insert_task_sorted_time(kanban *global_store, task *task, int new_time)
 {
-	int l = 0;
-	int h = global_store->tasks_count - 1;
-	int i, m = 0, cmp;
+	task_cmp task_cmp;
+	int m, i, moved;
 
-	while (l <= h)
+	task_cmp.description = task->description;
+	task_cmp.time = &new_time;
+
+	m = binary_search(&task_cmp, global_store->tasks_sorted_time, global_store->tasks_count, task_time_cmp);
+
+	if (m < 0)
 	{
-		m = (l + h) / 2;
-		cmp = global_store->tasks_sorted_time[m]->start_time - new_time;
-		if (cmp == 0)
-			cmp = strcmp(global_store->tasks_sorted_time[m]->description, task->description);
-		if (cmp == 0)
-			break;
-		else if (cmp > 0)
-			h = m - 1;
-		else if (cmp < 0)
-			l = ++m;
+		m = -m - 1;
 	}
 
-	for (i = 0, l = 0; i < global_store->tasks_count - 1; ++i)
+	for (i = 0, moved = 0; i < global_store->tasks_count - 1; ++i)
 	{
-		if (l)
+		if (moved)
 		{
 			global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i + 1];
 		}
 		else if (task == global_store->tasks_sorted_time[i])
 		{
-			l = 1;
+			moved = 1;
 			global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i + 1];
 		}
 	}
@@ -112,7 +119,7 @@ void insert_task_sorted_time(kanban *global_store, task *task, int new_time)
 	for (i = global_store->tasks_count; i >= m; --i)
 		global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i - 1];
 
-	global_store->tasks_sorted_time[m - l] = task;
+	global_store->tasks_sorted_time[m - moved] = task;
 }
 
 void update_task(kanban *global_store, int id, task task)
@@ -123,15 +130,13 @@ void update_task(kanban *global_store, int id, task task)
 /* Retorna 1 se já existir uma tarefa com esta descrição. Retorna 0 em caso contrário. */
 int is_duplicate_description(kanban *global_store, char description[])
 {
-	int i;
-	for (i = 0; i < global_store->tasks_count; ++i)
-	{
-		if (strcmp(global_store->tasks[i].description, description) == 0)
-		{
-			return 1;
-		}
-	}
-	return 0;
+	task_cmp task;
+	int result;
+
+	task.description = description;
+	result = binary_search(&task, global_store->tasks_sorted_desc, global_store->tasks_count, task_description_cmp);
+
+	return result >= 0;
 }
 
 /* Imprime todas as tarefas, ordenadas pela sua descrição, para o stdout */

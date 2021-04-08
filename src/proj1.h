@@ -51,6 +51,12 @@
 
 typedef struct
 {
+	char *description;
+	int *time;
+} task_cmp;
+
+typedef struct
+{
 	short id; /* irá ser sempre o índice na array + 1, ou zero caso não exista */
 	int duration;
 	char description[MAX_DESCRIPTION_LENGTH];
@@ -89,13 +95,19 @@ void handle_list_by_activities_command(kanban *global_store);
 
 void handle_activities_command(kanban *global_store);
 
+int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(const task *, const task_cmp *));
+
 /* tasks.c */
 
 int add_task(kanban *global_store, int duration, char description[]);
 
 task *get_task(kanban *global_store, int id);
 
+int task_description_cmp(const task *a, const task_cmp *b);
+
 void insert_task_sorted(kanban *global_store, task *task);
+
+int task_time_cmp(const task *a, const task_cmp *b);
 
 void insert_task_sorted_time(kanban *global_store, task *task, int new_time);
 

@@ -288,3 +288,25 @@ void handle_activities_command(kanban *global_store)
 		list_all_activities(global_store);
 	}
 }
+
+int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(const task *, const task_cmp *))
+{
+	int l = 0;
+	int h = nitems - 1;
+	int m = 0, cmp;
+
+	while (l <= h)
+	{
+		m = (l + h) / 2;
+		/*cmp = strcmp(global_store->tasks_sorted_desc[m]->description, task->description);*/
+		cmp = compare(list[m], key);
+		if (cmp == 0)
+			return m;
+		else if (cmp > 0)
+			h = m - 1;
+		else if (cmp < 0)
+			l = ++m;
+	}
+
+	return -(l + 1);
+}
