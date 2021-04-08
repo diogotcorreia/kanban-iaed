@@ -149,7 +149,7 @@ void print_all_tasks(kanban *global_store)
 void print_task_by_id(kanban *global_store, int id)
 {
 	task task = global_store->tasks[id - 1];
-	if (task.id > 0)
+	if (id > 0 && id - 1 < global_store->tasks_count)
 	{
 		printf(TASK_TO_STRING, task.id, get_activity(global_store, task.activity), task.duration, task.description);
 	}
