@@ -1,19 +1,15 @@
+/* Diogo Correia - ist199211 */
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
 
 #include "proj1.h"
 
-char *get_user(kanban *global_store, int index)
-{
-	return global_store->users[index];
-}
-
 /**
- * Adiciona um utilizador ao sistema.
- * Retorna 0, caso o utilizador seja criado com sucesso.
- * Caso o sistema tenha atingido o número máximo de utilizadores, retorna -1.
- * Caso já exista um utilizador com o mesmo nome, retorna um utilizador -2.
+ * Adds a new user to the Kanban global store.
+ * Returns 0 if the user is created successfully.
+ * If the store has reached the maximum user count, returns -1.
+ * If there is already a user with the given name, returns -1.
  */
 int add_user(kanban *global_store, char name[])
 {
@@ -32,7 +28,10 @@ int add_user(kanban *global_store, char name[])
 	return 0;
 }
 
-/* Retorna o índice se já existir um utilizador com este nome. Retorna -1 caso não exista. */
+/**
+ * Returns the index if the user with the given name.
+ * If the user does not exist, returns -1.
+ */
 int get_user_id(kanban *global_store, char name[])
 {
 	int i;
@@ -46,6 +45,9 @@ int get_user_id(kanban *global_store, char name[])
 	return -1;
 }
 
+/**
+ * Prints the name of all users, sorted by index.
+ */
 void list_all_users(kanban *global_store)
 {
 	int i;

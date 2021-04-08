@@ -14,6 +14,11 @@ int main()
 	return 0;
 }
 
+/**
+ * Handles command input.
+ * Returns 1 if the program should continue after running the command.
+ * Otherwise, returns 0.
+ */
 int handle_command(kanban *global_store)
 {
 	char c = getchar();
@@ -49,6 +54,10 @@ int handle_command(kanban *global_store)
 	}
 }
 
+/**
+ * Handles the 't' command.
+ *Adds a new task with the specified duration and description.
+ */
 void handle_add_task_command(kanban *global_store)
 {
 	int duration, result_task;
@@ -79,6 +88,11 @@ void handle_add_task_command(kanban *global_store)
 	}
 }
 
+/**
+ * Handles the 'l' command.
+ * If no arguments prints all tasks in alphabetical order.
+ * Otherwise, prints the tasks with the specified IDs.
+ */
 void handle_list_tasks_command(kanban *global_store)
 {
 	int id = 0, all = 1, neg = 0, read = 0;
@@ -96,15 +110,12 @@ void handle_list_tasks_command(kanban *global_store)
 			{
 				print_task_by_id(global_store, neg ? -id : id);
 			}
-			id = 0;
-			neg = 0;
-			read = 0;
+			id = 0, neg = 0, read = 0;
 		}
 		else
 		{
 			id = id * 10 + c - '0';
-			all = 0;
-			read = 1;
+			all = 0, read = 1;
 		}
 	}
 	if (read != 0)
@@ -117,6 +128,10 @@ void handle_list_tasks_command(kanban *global_store)
 	}
 }
 
+/**
+ * Handles the 'n' command.
+ * Forwards time by the amount specified.
+*/
 void handle_time_forward_command(kanban *global_store)
 {
 	int increment;
@@ -132,6 +147,11 @@ void handle_time_forward_command(kanban *global_store)
 	printf("%d\n", global_store->time);
 }
 
+/**
+ * Handles the 'u' command.
+ * Used for adding a new user if it has arguments,
+ * or prints all users if no arguments are specified.
+*/
 void handle_users_command(kanban *global_store)
 {
 	char c;
@@ -166,6 +186,12 @@ void handle_users_command(kanban *global_store)
 	}
 }
 
+/**
+ * Handles the 'm' command.
+ * Moves a task with the specified ID to another activity.
+ * If the task leaves TO DO, the leave time is saved to the task.
+ * If the task enters DONE, a message is printed with the task duration and slack.
+ */
 void handle_move_command(kanban *global_store)
 {
 	task *task;
@@ -224,6 +250,11 @@ void handle_move_command(kanban *global_store)
 	task->user_id = user_id;
 }
 
+/**
+ * Handles the 'd' command.
+ * Prints the tasks in the specified activity sorted by start time.
+ * If two or more tasks have the same start time, they're storted alphabetically.
+*/
 void handle_list_by_activities_command(kanban *global_store)
 {
 	char activity[MAX_ACTIVITY_NAME_LENGTH];
@@ -252,6 +283,11 @@ void handle_list_by_activities_command(kanban *global_store)
 	}
 }
 
+/**
+ * Handles the 'a' command.
+ * Adds a new activity to the Kanban.
+ * If no arguments are specified, prints the name of all activities.
+ */
 void handle_activities_command(kanban *global_store)
 {
 	char c;
@@ -289,6 +325,12 @@ void handle_activities_command(kanban *global_store)
 	}
 }
 
+/**
+ * Auxiliary function that performs a binary search in a list of tasks,
+ * using the 'compare' function passed as a parameter.
+ * If the task is not present in a list, it returns a negative number
+ *that can be used to find the insertion index by doing -i-1.
+ */
 int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(const task *, const task_cmp *))
 {
 	int l = 0;
@@ -298,7 +340,6 @@ int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(c
 	while (l <= h)
 	{
 		m = (l + h) / 2;
-		/*cmp = strcmp(global_store->tasks_sorted_desc[m]->description, task->description);*/
 		cmp = compare(list[m], key);
 		if (cmp == 0)
 			return m;

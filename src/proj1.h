@@ -1,3 +1,4 @@
+/* Diogo Correia - ist199211 */
 #ifndef MAIN_H
 #define MAIN_H
 
@@ -111,8 +112,6 @@ int task_time_cmp(const task *a, const task_cmp *b);
 
 void insert_task_sorted_time(kanban *global_store, task *task, int new_time);
 
-void update_task(kanban *global_store, int id, task task);
-
 int is_duplicate_description(kanban *global_store, char description[]);
 
 void print_all_tasks(kanban *global_store);
@@ -134,8 +133,6 @@ int is_invalid_activity_name(char name[]);
 void list_all_activities(kanban *global_store);
 
 /* users.h */
-
-char *get_user(kanban *global_store, int index);
 
 int add_user(kanban *global_store, char name[]);
 
