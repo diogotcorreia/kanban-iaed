@@ -8,9 +8,12 @@
 int main()
 {
 	kanban global_store = {0};
-	setup_activities(&global_store);
+	setup_activities(&global_store); /* add TO DO, IN PROGRESS and DONE */
+
+	/* execute program until the user send the 'q' command */
 	while (handle_command(&global_store))
 		;
+
 	return 0;
 }
 
@@ -64,9 +67,7 @@ void handle_add_task_command(kanban *global_store)
 	char description[MAX_DESCRIPTION_LENGTH];
 
 	scanf("%d", &duration);
-	getchar(); /* consume space before description */
-	fgets(description, MAX_DESCRIPTION_LENGTH, stdin);
-	description[strcspn(description, "\n")] = 0; /* remover \n no final da string */
+	populate_string(description, MAX_DESCRIPTION_LENGTH);
 
 	result_task = add_task(global_store, duration, description);
 
@@ -154,22 +155,14 @@ void handle_time_forward_command(kanban *global_store)
 */
 void handle_users_command(kanban *global_store)
 {
-	char c;
-	int i = 0, result;
+	int i;
 	char name[MAX_USER_NAME_LENGTH];
 
-	while ((c = getchar()) != EOF && c != '\n' && i < MAX_USER_NAME_LENGTH - 1)
-	{
-		if (!isspace(c))
-		{
-			name[i++] = c;
-		}
-	}
-	name[i] = '\0';
+	i = populate_string(name, MAX_USER_NAME_LENGTH);
 
-	if (i)
+	if (i) /* command has an argument */
 	{
-		result = add_user(global_store, name);
+		int result = add_user(global_store, name);
 		switch (result)
 		{
 		case -1:
@@ -201,53 +194,63 @@ void handle_move_command(kanban *global_store)
 
 	scanf("%d", &task_id);
 	scanf("%s", user);
-
-	getchar(); /* read space after user */
-	fgets(activity, MAX_ACTIVITY_NAME_LENGTH, stdin);
-	activity[strcspn(activity, "\n")] = 0; /* remover \n no final da string */
+	populate_string(activity, MAX_ACTIVITY_NAME_LENGTH);
 
 	task = get_task(global_store, task_id);
 	user_id = get_user_id(global_store, user);
 	activity_id = get_activity_id(global_store, activity);
 
 	/* verificar condições e retornar erros */
+	if (!move_command_has_errors(task, user_id, activity_id))
+	{
+		if (task->activity == ACTIVITY_TODO_ID)
+		{
+			insert_task_sorted_time(global_store, task, global_store->time);
+			task->start_time = global_store->time;
+		}
+
+		if (activity_id == ACTIVITY_DONE_ID && task->activity != ACTIVITY_DONE_ID)
+		{
+			int duration = global_store->time - task->start_time;
+			printf(TASK_MOVE_DURATION, duration, duration - task->duration);
+		}
+
+		task->activity = activity_id;
+		task->user_id = user_id;
+	}
+}
+
+/**
+ * Checks if the input for the 'm' command has errors.
+ * If so, returns 1, otherwise returns 0.
+ */
+int move_command_has_errors(task *task, int user_id, int activity_id)
+{
 	if (task == 0 || task->id == 0)
 	{
 		printf(TASK_MOVE_ERR_NO_SUCH_TASK);
-		return;
+		return 1;
 	}
-	else if (strcmp(activity, ACTIVITY_TODO) == 0)
+	else if (task->activity == activity_id)
 	{
-		if (task->activity != ACTIVITY_TODO_ID)
-		{
-			printf(TASK_MOVE_ERR_ALREADY_STARTED);
-		}
-		return;
+		return 1; /* ignore moving to the same activity */
+	}
+	else if (activity_id == ACTIVITY_TODO_ID)
+	{
+		printf(TASK_MOVE_ERR_ALREADY_STARTED);
+		return 1;
 	}
 	else if (user_id < 0)
 	{
 		printf(TASK_MOVE_ERR_NO_SUCH_USER);
-		return;
+		return 1;
 	}
 	else if (activity_id < 0)
 	{
 		printf(TASK_MOVE_ERR_NO_SUCH_ACTIVITY);
-		return;
+		return 1;
 	}
-
-	if (task->activity == ACTIVITY_TODO_ID)
-	{
-		insert_task_sorted_time(global_store, task, global_store->time);
-		task->start_time = global_store->time;
-	}
-
-	if (activity_id == ACTIVITY_DONE_ID && task->activity != ACTIVITY_DONE_ID)
-	{
-		printf(TASK_MOVE_DURATION, global_store->time - task->start_time, global_store->time - task->start_time - task->duration);
-	}
-
-	task->activity = activity_id;
-	task->user_id = user_id;
+	return 0;
 }
 
 /**
@@ -261,9 +264,7 @@ void handle_list_by_activities_command(kanban *global_store)
 	int activity_id, i;
 	task *task;
 
-	getchar(); /* read space after command */
-	fgets(activity, MAX_ACTIVITY_NAME_LENGTH, stdin);
-	activity[strcspn(activity, "\n")] = 0; /* remover \n no final da string */
+	populate_string(activity, MAX_ACTIVITY_NAME_LENGTH);
 
 	activity_id = get_activity_id(global_store, activity);
 
@@ -290,22 +291,14 @@ void handle_list_by_activities_command(kanban *global_store)
  */
 void handle_activities_command(kanban *global_store)
 {
-	char c;
-	int i = 0, result;
+	int i;
 	char name[MAX_ACTIVITY_NAME_LENGTH];
 
-	while ((c = getchar()) != EOF && c != '\n' && i < MAX_ACTIVITY_NAME_LENGTH - 1)
-	{
-		if (i || !isspace(c))
-		{
-			name[i++] = c;
-		}
-	}
-	name[i] = '\0';
+	i = populate_string(name, MAX_ACTIVITY_NAME_LENGTH);
 
-	if (i)
+	if (i) /* command has an argument */
 	{
-		result = add_activity(global_store, name);
+		int result = add_activity(global_store, name);
 		switch (result)
 		{
 		case -1:
@@ -350,4 +343,31 @@ int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(c
 	}
 
 	return -(l + 1);
+}
+
+/**
+ * Populates the given string with the input from stdin, ignoring leading
+ * spaces. If length is reached before reaching a line break or EOF,
+ * this function will keep reading and discarding the output.
+ * Passing length zero will discard all input from stdin until a line break
+ * or EOF.
+ * Returns the length of the string.
+ */
+int populate_string(char *s, int length)
+{
+	int i = 0;
+	char c;
+
+	while ((c = getchar()) != EOF && c != '\n')
+	{
+		/* ignore leading whitespace and input after string is full */
+		if ((i != 0 && i < length - 1) || (i == 0 && !isspace(c)))
+		{
+			s[i++] = c;
+		}
+	}
+	if (length > 0)
+		s[i] = '\0';
+
+	return i;
 }

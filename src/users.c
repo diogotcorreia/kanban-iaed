@@ -14,13 +14,13 @@
 int add_user(kanban *global_store, char name[])
 {
 	/* verificação de argumentos */
-	if (global_store->users_count == MAX_USERS)
-	{
-		return -1;
-	}
 	if (get_user_id(global_store, name) >= 0)
 	{
 		return -2;
+	}
+	if (global_store->users_count == MAX_USERS)
+	{
+		return -1;
 	}
 
 	strcpy(global_store->users[global_store->users_count++], name);

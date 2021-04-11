@@ -92,11 +92,15 @@ void handle_users_command(kanban *global_store);
 
 void handle_move_command(kanban *global_store);
 
+int move_command_has_errors(task *task, int user_id, int activity_id);
+
 void handle_list_by_activities_command(kanban *global_store);
 
 void handle_activities_command(kanban *global_store);
 
 int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(const task *, const task_cmp *));
+
+int populate_string(char *s, int length);
 
 /* tasks.c */
 

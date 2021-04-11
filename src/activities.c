@@ -34,10 +34,6 @@ char *get_activity(kanban *global_store, int index)
 int add_activity(kanban *global_store, char name[MAX_ACTIVITY_NAME_LENGTH])
 {
 	/* verificação de argumentos */
-	if (global_store->activities_count == MAX_ACTIVITIES)
-	{
-		return -1;
-	}
 	if (get_activity_id(global_store, name) >= 0)
 	{
 		return -2;
@@ -45,6 +41,10 @@ int add_activity(kanban *global_store, char name[MAX_ACTIVITY_NAME_LENGTH])
 	if (is_invalid_activity_name(name))
 	{
 		return -3;
+	}
+	if (global_store->activities_count == MAX_ACTIVITIES)
+	{
+		return -1;
 	}
 
 	strcpy(global_store->activities[global_store->activities_count++], name);
