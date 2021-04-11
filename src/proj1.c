@@ -1,18 +1,17 @@
 /* Diogo Correia - ist199211 */
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-
 #include "proj1.h"
 
-int main()
-{
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
+int main() {
 	kanban global_store = {0};
 	setup_activities(&global_store); /* add TO DO, IN PROGRESS and DONE */
 
-	/* execute program until the user send the 'q' command */
-	while (handle_command(&global_store))
-		;
+	/* execute program until the user sends the 'q' command */
+	while (handle_command(&global_store)) {
+	}
 
 	return 0;
 }
@@ -22,38 +21,36 @@ int main()
  * Returns 1 if the program should continue after running the command.
  * Otherwise, returns 0.
  */
-int handle_command(kanban *global_store)
-{
+int handle_command(kanban *global_store) {
 	char c = getchar();
-	switch (c)
-	{
-	case 't':
-		handle_add_task_command(global_store);
-		return 1;
-	case 'l':
-		handle_list_tasks_command(global_store);
-		return 1;
-	case 'n':
-		handle_time_forward_command(global_store);
-		return 1;
-	case 'u':
-		handle_users_command(global_store);
-		return 1;
-	case 'm':
-		handle_move_command(global_store);
-		return 1;
-	case 'd':
-		handle_list_by_activities_command(global_store);
-		return 1;
-	case 'a':
-		handle_activities_command(global_store);
-		return 1;
-	case 'q':
-		/* Sair do programa */
-		return 0;
-	default:
-		/* Ignorar comandos desconhecidos */
-		return 1;
+	switch (c) {
+		case 't':
+			handle_add_task_command(global_store);
+			return 1;
+		case 'l':
+			handle_list_tasks_command(global_store);
+			return 1;
+		case 'n':
+			handle_time_forward_command(global_store);
+			return 1;
+		case 'u':
+			handle_users_command(global_store);
+			return 1;
+		case 'm':
+			handle_move_command(global_store);
+			return 1;
+		case 'd':
+			handle_list_by_activities_command(global_store);
+			return 1;
+		case 'a':
+			handle_activities_command(global_store);
+			return 1;
+		case 'q':
+			/* stop the program */
+			return 0;
+		default:
+			/* ignore unknown commands */
+			return 1;
 	}
 }
 
@@ -61,8 +58,7 @@ int handle_command(kanban *global_store)
  * Handles the 't' command.
  * Adds a new task with the specified duration and description.
  */
-void handle_add_task_command(kanban *global_store)
-{
+void handle_add_task_command(kanban *global_store) {
 	int duration, result_task;
 	char description[MAX_DESCRIPTION_LENGTH];
 
@@ -71,20 +67,14 @@ void handle_add_task_command(kanban *global_store)
 
 	result_task = add_task(global_store, duration, description);
 
-	if (result_task == -1)
-	{
+	if (result_task == -1) {
 		printf(TASK_ERR_TOO_MANY_TASKS);
-	}
-	else if (result_task == -2)
-	{
+	} else if (result_task == -2) {
 		printf(TASK_ERR_DUPLICATE_DESCRIPTION);
-	}
-	else if (result_task == -3)
-	{
+	} else if (result_task == -3) {
 		printf(TASK_ERR_INVALID_DURATION);
-	}
-	else /* result_task is the ID of the task */
-	{
+	} else {
+		/* result_task is the ID of the task */
 		printf(TASK_ADD_SUCCESS, result_task);
 	}
 }
@@ -94,40 +84,32 @@ void handle_add_task_command(kanban *global_store)
  * If no arguments prints all tasks in alphabetical order.
  * Otherwise, prints the tasks with the specified IDs.
  */
-void handle_list_tasks_command(kanban *global_store)
-{
+void handle_list_tasks_command(kanban *global_store) {
 	int id = 0, all = 1, neg = 0, read = 0;
 	char c;
 
 	/* read numbers one at a time, printing the output after reading a number */
-	while ((c = getchar()) != EOF && c != '\n')
-	{
-		if (c == '-') /* handle negative numbers correctly */
-		{
-			neg = 1;
-		}
-		else if (c < '0' || c > '9')
-		{
+	while ((c = getchar()) != EOF && c != '\n') {
+		if (c == '-') {
+			neg = 1; /* handle negative numbers correctly */
+		} else if (c < '0' || c > '9') {
 			/* print the task with the id, if we had a number. reset values */
-			if (read != 0)
-			{
+			if (read != 0) {
 				print_task_by_id(global_store, neg ? -id : id);
 			}
 			id = 0, neg = 0, read = 0;
-		}
-		else
-		{
+		} else {
 			/* add read digit to our number */
 			id = id * 10 + c - '0';
 			all = 0, read = 1;
 		}
 	}
-	if (read != 0) /* print leftover number from while loop */
-	{
+	if (read != 0) {
+		/* print leftover number from while loop */
 		print_task_by_id(global_store, neg ? -id : id);
 	}
-	if (all) /* if there was no number inserted, print all tasks */
-	{
+	if (all) {
+		/* if there was no number inserted, print all tasks */
 		print_all_tasks(global_store);
 	}
 }
@@ -135,14 +117,12 @@ void handle_list_tasks_command(kanban *global_store)
 /**
  * Handles the 'n' command.
  * Forwards time by the amount specified.
-*/
-void handle_time_forward_command(kanban *global_store)
-{
+ */
+void handle_time_forward_command(kanban *global_store) {
 	int increment;
 	scanf("%d", &increment);
 
-	if (increment < 0)
-	{
+	if (increment < 0) {
 		printf(TIME_ERR_INVALID);
 		return;
 	}
@@ -155,9 +135,8 @@ void handle_time_forward_command(kanban *global_store)
  * Handles the 'u' command.
  * Used for adding a new user if it has arguments,
  * or prints all users if no arguments are specified.
-*/
-void handle_users_command(kanban *global_store)
-{
+ */
+void handle_users_command(kanban *global_store) {
 	int i;
 	char name[MAX_USER_NAME_LENGTH];
 
@@ -166,18 +145,15 @@ void handle_users_command(kanban *global_store)
 	if (i) /* command has an argument */
 	{
 		int result = add_user(global_store, name);
-		switch (result)
-		{
-		case -1:
-			printf(USER_ERR_TOO_MANY);
-			break;
-		case -2:
-			printf(USER_ERR_DUPLICATE);
-			break;
+		switch (result) {
+			case -1:
+				printf(USER_ERR_TOO_MANY);
+				break;
+			case -2:
+				printf(USER_ERR_DUPLICATE);
+				break;
 		}
-	}
-	else
-	{
+	} else {
 		list_all_users(global_store);
 	}
 }
@@ -186,10 +162,10 @@ void handle_users_command(kanban *global_store)
  * Handles the 'm' command.
  * Moves a task with the specified ID to another activity.
  * If the task leaves TO DO, the leave time is saved to the task.
- * If the task enters DONE, a message is printed with the task duration and slack.
+ * If the task enters DONE, a message is printed with the task duration and
+ * slack.
  */
-void handle_move_command(kanban *global_store)
-{
+void handle_move_command(kanban *global_store) {
 	task *task;
 	int task_id, user_id, activity_id;
 	char user[MAX_USER_NAME_LENGTH];
@@ -204,17 +180,14 @@ void handle_move_command(kanban *global_store)
 	user_id = get_user_id(global_store, user);
 	activity_id = get_activity_id(global_store, activity);
 
-	if (!move_command_has_errors(task, user_id, activity_id))
-	{
+	if (!move_command_has_errors(task, user_id, activity_id)) {
 		/* if all the arguments are correct, handle the move */
-		if (task->activity == ACTIVITY_TODO_ID)
-		{
+		if (task->activity == ACTIVITY_TODO_ID) {
 			insert_task_sorted_time(global_store, task, global_store->time);
 			task->start_time = global_store->time;
 		}
 
-		if (activity_id == ACTIVITY_DONE_ID)
-		{
+		if (activity_id == ACTIVITY_DONE_ID) {
 			int duration = global_store->time - task->start_time;
 			printf(TASK_MOVE_DURATION, duration, duration - task->duration);
 		}
@@ -228,29 +201,19 @@ void handle_move_command(kanban *global_store)
  * Checks if the input for the 'm' command has errors.
  * If so, returns 1, otherwise returns 0.
  */
-int move_command_has_errors(task *task, int user_id, int activity_id)
-{
-	if (task == 0 || task->id == 0)
-	{
+int move_command_has_errors(task *task, int user_id, int activity_id) {
+	if (task == 0 || task->id == 0) {
 		printf(TASK_MOVE_ERR_NO_SUCH_TASK); /* check if task exists */
 		return 1;
-	}
-	else if (task->activity == activity_id)
-	{
+	} else if (task->activity == activity_id) {
 		return 1; /* ignore moving to the same activity */
-	}
-	else if (activity_id == ACTIVITY_TODO_ID)
-	{
+	} else if (activity_id == ACTIVITY_TODO_ID) {
 		printf(TASK_MOVE_ERR_ALREADY_STARTED); /* can't move task back to TO DO */
 		return 1;
-	}
-	else if (user_id < 0)
-	{
+	} else if (user_id < 0) {
 		printf(TASK_MOVE_ERR_NO_SUCH_USER); /* user does not exist */
 		return 1;
-	}
-	else if (activity_id < 0)
-	{
+	} else if (activity_id < 0) {
 		printf(TASK_MOVE_ERR_NO_SUCH_ACTIVITY); /* activity does not exist */
 		return 1;
 	}
@@ -260,10 +223,10 @@ int move_command_has_errors(task *task, int user_id, int activity_id)
 /**
  * Handles the 'd' command.
  * Prints the tasks in the specified activity sorted by start time.
- * If two or more tasks have the same start time, they're storted alphabetically.
-*/
-void handle_list_by_activities_command(kanban *global_store)
-{
+ * If two or more tasks have the same start time, they're storted
+ * alphabetically.
+ */
+void handle_list_by_activities_command(kanban *global_store) {
 	char activity[MAX_ACTIVITY_NAME_LENGTH];
 	int activity_id, i;
 	task *task;
@@ -272,20 +235,18 @@ void handle_list_by_activities_command(kanban *global_store)
 
 	activity_id = get_activity_id(global_store, activity);
 
-	if (activity_id < 0)
-	{
+	if (activity_id < 0) {
 		printf(TASK_BY_ACTIVITY_ERR_NO_SUCH_ACTIVITY);
 		return;
 	}
 
-	for (i = 0; i < global_store->tasks_count; ++i)
-	{
-		/* the tasks_sorted_time array is already sorted by time and description,
-			so we just need to print, the tasks that belong to the activity we want */
+	for (i = 0; i < global_store->tasks_count; ++i) {
+		/* the tasks_sorted_time array is already sorted by time and description, so
+		 * we just need to print, the tasks that belong to the activity we want */
 		task = global_store->tasks_sorted_time[i];
-		if (task->activity == activity_id)
-		{
-			printf(TASK_BY_ACTIVITY_TO_STR, task->id, task->start_time, task->description);
+		if (task->activity == activity_id) {
+			printf(TASK_BY_ACTIVITY_TO_STR, task->id, task->start_time,
+			       task->description);
 		}
 	}
 }
@@ -295,8 +256,7 @@ void handle_list_by_activities_command(kanban *global_store)
  * Adds a new activity to the Kanban.
  * If no arguments are specified, prints the name of all activities.
  */
-void handle_activities_command(kanban *global_store)
-{
+void handle_activities_command(kanban *global_store) {
 	int i;
 	char name[MAX_ACTIVITY_NAME_LENGTH];
 
@@ -305,21 +265,18 @@ void handle_activities_command(kanban *global_store)
 	if (i) /* command has an argument */
 	{
 		int result = add_activity(global_store, name);
-		switch (result)
-		{
-		case -1:
-			printf(ACTIVITY_ERR_TOO_MANY);
-			break;
-		case -2:
-			printf(ACTIVITY_ERR_DUPLICATE);
-			break;
-		case -3:
-			printf(ACTIVITY_ERR_INVALID_DESC);
-			break;
+		switch (result) {
+			case -1:
+				printf(ACTIVITY_ERR_TOO_MANY);
+				break;
+			case -2:
+				printf(ACTIVITY_ERR_DUPLICATE);
+				break;
+			case -3:
+				printf(ACTIVITY_ERR_INVALID_DESC);
+				break;
 		}
-	}
-	else
-	{
+	} else {
 		list_all_activities(global_store);
 	}
 }
@@ -328,16 +285,15 @@ void handle_activities_command(kanban *global_store)
  * Auxiliary function that performs a binary search in a list of tasks,
  * using the 'compare' function passed as a parameter.
  * If the task is not present in a list, it returns a negative number
- *that can be used to find the insertion index by doing -i-1.
+ * that can be used to find the insertion index by doing -i-1.
  */
-int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(const task *, const task_cmp *))
-{
+int binary_search(const task_cmp *key, task **list, int nitems,
+                  int (*compare)(const task *, const task_cmp *)) {
 	int l = 0;
 	int h = nitems - 1;
 	int m = 0, cmp;
 
-	while (l <= h)
-	{
+	while (l <= h) {
 		m = (l + h) / 2;
 		cmp = compare(list[m], key);
 		if (cmp == 0)
@@ -348,8 +304,8 @@ int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(c
 			l = ++m;
 	}
 
-	/* if the item hasn't been found, return an expression that can be
-		used to find the insertion index */
+	/* if the item hasn't been found, return an expression that can be used to
+	 * find the insertion index */
 	return -(l + 1);
 }
 
@@ -359,22 +315,18 @@ int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(c
  * this function will keep reading and discarding the output.
  * Returns the length of the string.
  */
-int populate_string(char *s, int length)
-{
+int populate_string(char *s, int length) {
 	int i = 0;
 	char c;
 
-	while ((c = getchar()) != EOF && c != '\n')
-	{
+	while ((c = getchar()) != EOF && c != '\n') {
 		/* ignore leading whitespace and also input after string is full */
-		if ((i != 0 && i < length - 1) || (i == 0 && !isspace(c)))
-		{
+		if ((i != 0 && i < length - 1) || (i == 0 && !isspace(c))) {
 			s[i++] = c;
 		}
 	}
 
-	if (length > 0)
-	{
+	if (length > 0) {
 		s[i] = '\0';
 	}
 

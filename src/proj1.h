@@ -51,15 +51,13 @@
 #define USER_ERR_TOO_MANY "too many users\n"
 #define USER_ERR_DUPLICATE "user already exists\n"
 
-typedef struct
-{
+typedef struct {
 	char *description;
 	int *time;
 } task_cmp;
 
-typedef struct
-{
-	short id; /* irá ser sempre o índice na array + 1, ou zero caso não exista */
+typedef struct {
+	short id;
 	int duration;
 	char description[MAX_DESCRIPTION_LENGTH];
 	int activity;
@@ -67,8 +65,7 @@ typedef struct
 	int user_id;
 } task;
 
-typedef struct
-{
+typedef struct {
 	task tasks[MAX_TASKS];
 	int tasks_count;
 	char activities[MAX_ACTIVITIES][MAX_ACTIVITY_NAME_LENGTH];
@@ -80,7 +77,8 @@ typedef struct
 	task *tasks_sorted_time[MAX_TASKS];
 } kanban;
 
-/* Recebe um comando do stdin, e redireciona para a função desejada */
+/* proj1.c */
+
 int handle_command(kanban *global_store);
 
 void handle_add_task_command(kanban *global_store);
@@ -99,7 +97,8 @@ void handle_list_by_activities_command(kanban *global_store);
 
 void handle_activities_command(kanban *global_store);
 
-int binary_search(const task_cmp *key, task **list, int nitems, int (*compare)(const task *, const task_cmp *));
+int binary_search(const task_cmp *key, task **list, int nitems,
+                  int (*compare)(const task *, const task_cmp *));
 
 int populate_string(char *s, int length);
 
@@ -123,7 +122,7 @@ void print_all_tasks(kanban *global_store);
 
 void print_task_by_id(kanban *global_store, int id);
 
-/* activities.h */
+/* activities.c */
 
 void setup_activities(kanban *global_store);
 
@@ -137,7 +136,7 @@ int is_invalid_activity_name(char name[]);
 
 void list_all_activities(kanban *global_store);
 
-/* users.h */
+/* users.c */
 
 int add_user(kanban *global_store, char name[]);
 

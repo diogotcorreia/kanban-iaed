@@ -1,7 +1,7 @@
 /* Diogo Correia - ist199211 */
-#include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "proj1.h"
 
@@ -11,15 +11,12 @@
  * If the store has reached the maximum user count, returns -1.
  * If there is already a user with the given name, returns -1.
  */
-int add_user(kanban *global_store, char name[])
-{
+int add_user(kanban *global_store, char name[]) {
 	/* check argument validity */
-	if (get_user_id(global_store, name) >= 0)
-	{
+	if (get_user_id(global_store, name) >= 0) {
 		return -2;
 	}
-	if (global_store->users_count == MAX_USERS)
-	{
+	if (global_store->users_count == MAX_USERS) {
 		return -1;
 	}
 
@@ -32,13 +29,10 @@ int add_user(kanban *global_store, char name[])
  * Returns the index if the user with the given name.
  * If the user does not exist, returns -1.
  */
-int get_user_id(kanban *global_store, char name[])
-{
+int get_user_id(kanban *global_store, char name[]) {
 	int i;
-	for (i = 0; i < global_store->users_count; ++i)
-	{
-		if (strcmp(global_store->users[i], name) == 0)
-		{
+	for (i = 0; i < global_store->users_count; ++i) {
+		if (strcmp(global_store->users[i], name) == 0) {
 			return i;
 		}
 	}
@@ -48,11 +42,9 @@ int get_user_id(kanban *global_store, char name[])
 /**
  * Prints the name of all users, sorted by index.
  */
-void list_all_users(kanban *global_store)
-{
+void list_all_users(kanban *global_store) {
 	int i;
-	for (i = 0; i < global_store->users_count; ++i)
-	{
+	for (i = 0; i < global_store->users_count; ++i) {
 		printf(USER_TO_STRING, global_store->users[i]);
 	}
 }
