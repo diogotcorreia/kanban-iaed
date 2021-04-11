@@ -26,6 +26,8 @@ int add_task(kanban *global_store, int duration, char description[])
 	{
 		return -3;
 	}
+
+	/* save task properties */
 	new_task.id = global_store->tasks_count + 1;
 	new_task.duration = duration;
 	new_task.user_id = -1;
@@ -33,6 +35,8 @@ int add_task(kanban *global_store, int duration, char description[])
 
 	global_store->tasks[global_store->tasks_count] = new_task;
 
+	/* save the task, sorted by description (and time),
+		on pointer arrays for easy access by the 'l' and 'd' commands */
 	insert_task_sorted(global_store, &global_store->tasks[global_store->tasks_count]);
 	insert_task_sorted_time(global_store, &global_store->tasks[global_store->tasks_count], 0);
 
@@ -43,13 +47,13 @@ int add_task(kanban *global_store, int duration, char description[])
 
 /**
  * Returns a pointer to the task with the given ID.
- * If the task does not exist, returns -1.
+ * If the task does not exist, returns 0.
  */
 task *get_task(kanban *global_store, int id)
 {
 	if (id <= 0 || id > global_store->tasks_count)
 	{
-		return 0;
+		return 0; /* task id outside array bounds */
 	}
 	return &global_store->tasks[id - 1];
 }
@@ -72,12 +76,16 @@ void insert_task_sorted(kanban *global_store, task *task)
 	int m, i;
 	task_cmp task_cmp;
 
+	/* add description to the task comparison struct */
 	task_cmp.description = task->description;
 
-	m = binary_search(&task_cmp, global_store->tasks_sorted_desc, global_store->tasks_count, task_description_cmp);
+	m = binary_search(&task_cmp, global_store->tasks_sorted_desc,
+										global_store->tasks_count, task_description_cmp);
 
 	if (m < 0)
 	{
+		/* this is going to always happen,
+			but leave it here in case behaviour changes */
 		m = -m - 1;
 	}
 
@@ -98,6 +106,7 @@ int task_time_cmp(const task *a, const task_cmp *b)
 	cmp = a->start_time - *b->time;
 	if (cmp == 0)
 	{
+		/* if time is the same, compare descriptions instead */
 		cmp = strcmp(a->description, b->description);
 	}
 	return cmp;
@@ -117,7 +126,8 @@ void insert_task_sorted_time(kanban *global_store, task *task, int new_time)
 	task_cmp.description = task->description;
 	task_cmp.time = &new_time;
 
-	m = binary_search(&task_cmp, global_store->tasks_sorted_time, global_store->tasks_count, task_time_cmp);
+	m = binary_search(&task_cmp, global_store->tasks_sorted_time,
+										global_store->tasks_count, task_time_cmp);
 
 	if (m >= 0)
 	{
@@ -125,19 +135,17 @@ void insert_task_sorted_time(kanban *global_store, task *task, int new_time)
 	}
 	m = -m - 1;
 
+	/* move elements backwards to fill space left by moved task */
 	for (i = 0, moved = 0; i < global_store->tasks_count - 1; ++i)
 	{
-		if (moved)
-		{
-			global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i + 1];
-		}
-		else if (task == global_store->tasks_sorted_time[i])
+		if (moved || task == global_store->tasks_sorted_time[i])
 		{
 			moved = 1;
 			global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i + 1];
 		}
 	}
 
+	/* move elements after insertion index forward to open space for moved task */
 	for (i = global_store->tasks_count; i >= m; --i)
 		global_store->tasks_sorted_time[i] = global_store->tasks_sorted_time[i - 1];
 
@@ -155,8 +163,10 @@ int is_duplicate_description(kanban *global_store, char description[])
 	int result;
 
 	task.description = description;
-	result = binary_search(&task, global_store->tasks_sorted_desc, global_store->tasks_count, task_description_cmp);
+	result = binary_search(&task, global_store->tasks_sorted_desc,
+												 global_store->tasks_count, task_description_cmp);
 
+	/* if binary search returns a value >= 0, then the item exists */
 	return result >= 0;
 }
 
@@ -167,10 +177,12 @@ void print_all_tasks(kanban *global_store)
 {
 	int i;
 	task *task;
+	char *activity;
 	for (i = 0; i < global_store->tasks_count; ++i)
 	{
 		task = global_store->tasks_sorted_desc[i];
-		printf(TASK_TO_STRING, task->id, get_activity(global_store, task->activity), task->duration, task->description);
+		activity = get_activity(global_store, task->activity);
+		printf(TASK_TO_STRING, task->id, activity, task->duration, task->description);
 	}
 }
 
@@ -181,7 +193,7 @@ void print_all_tasks(kanban *global_store)
 void print_task_by_id(kanban *global_store, int id)
 {
 	task *task = get_task(global_store, id);
-	if (task != 0)
+	if (task) /* if task exists */
 	{
 		char *activity = get_activity(global_store, task->activity);
 		printf(TASK_TO_STRING, task->id, activity, task->duration, task->description);

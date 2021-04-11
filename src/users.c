@@ -13,7 +13,7 @@
  */
 int add_user(kanban *global_store, char name[])
 {
-	/* verificação de argumentos */
+	/* check argument validity */
 	if (get_user_id(global_store, name) >= 0)
 	{
 		return -2;

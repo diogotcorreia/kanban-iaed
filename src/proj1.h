@@ -3,6 +3,7 @@
 #define MAIN_H
 
 #define TIME_ERR_INVALID "invalid time\n"
+#define TIME_MSG "%d\n"
 
 /* tasks */
 

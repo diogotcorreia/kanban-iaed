@@ -33,7 +33,7 @@ char *get_activity(kanban *global_store, int index)
  */
 int add_activity(kanban *global_store, char name[MAX_ACTIVITY_NAME_LENGTH])
 {
-	/* verificação de argumentos */
+	/* check argument validity */
 	if (get_activity_id(global_store, name) >= 0)
 	{
 		return -2;
@@ -53,7 +53,8 @@ int add_activity(kanban *global_store, char name[MAX_ACTIVITY_NAME_LENGTH])
 }
 
 /**
- * Returns the index of the activity with the given name. Returns -1 if it does not exist.
+ * Returns the index of the activity with the given name.
+ * Returns -1 if it does not exist.
  */
 int get_activity_id(kanban *global_store, char name[])
 {
@@ -81,7 +82,7 @@ int is_invalid_activity_name(char name[])
 		c = name[i];
 		if (c == '\0')
 		{
-			break;
+			break; /* stop the loop if we've reached the end of the string */
 		}
 		if (islower(c))
 		{
