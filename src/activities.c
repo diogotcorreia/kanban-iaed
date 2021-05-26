@@ -10,9 +10,16 @@
  * to the Kanban global store.
  */
 void setup_activities(kanban *global_store) {
-	add_activity(global_store, ACTIVITY_TODO);
-	add_activity(global_store, ACTIVITY_IN_PROGRESS);
-	add_activity(global_store, ACTIVITY_DONE);
+	/* I had to change this since newer versions of GCC (testing with v11.1.0)
+	 * don't compile because of a pointer to fixed-length array conversion issue.
+	 * This change in GCC was made after the delivery of the first project.
+	 * The error is: ‘add_activity’ accessing 101 bytes in a region of size 6 */
+	char TODO[MAX_ACTIVITY_NAME_LENGTH] = ACTIVITY_TODO;
+	char IN_PROGRESS[MAX_ACTIVITY_NAME_LENGTH] = ACTIVITY_IN_PROGRESS;
+	char DONE[MAX_ACTIVITY_NAME_LENGTH] = ACTIVITY_DONE;
+	add_activity(global_store, TODO);
+	add_activity(global_store, IN_PROGRESS);
+	add_activity(global_store, DONE);
 }
 
 /**

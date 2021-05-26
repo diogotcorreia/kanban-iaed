@@ -45,6 +45,9 @@ int handle_command(kanban *global_store) {
 		case 'a':
 			handle_activities_command(global_store);
 			return 1;
+		case 'g':
+			handle_groups_command(global_store);
+			return 1;
 		case 'q':
 			/* stop the program */
 			return 0;
@@ -279,6 +282,57 @@ void handle_activities_command(kanban *global_store) {
 	} else {
 		list_all_activities(global_store);
 	}
+}
+
+/**
+ * Handles the 'g' command.
+ * Adds a new group to the Kanban.
+ */
+void handle_groups_command(kanban *global_store) {
+	char group_name[MAX_USER_NAME_LENGTH];
+	char input_str[(MAX_USER_NAME_LENGTH + 1) * MAX_GROUP_USERS];
+	char group_members[MAX_USER_NAME_LENGTH][MAX_GROUP_USERS];
+	char *member;
+	int member_count = 0, error_no_such_user = 0, error_repeated = 0;
+
+	scanf("%s", group_name);
+	fgets(input_str, (MAX_USER_NAME_LENGTH + 1) * MAX_GROUP_USERS, stdin);
+
+	for (member = strtok(input_str, WHITESPACE); member != NULL;
+	     member = strtok(NULL, WHITESPACE), ++member_count) {
+		/* save the errors for later to show them in order */
+		if (in_char_array(group_members, member_count, member)) error_repeated = 1;
+		if (get_user_id(global_store, member) < 0) error_no_such_user = 1;
+
+		strcpy(group_members[member_count], member);
+	}
+
+	if (get_user_id(global_store, group_name) >= 0) {
+		printf(USER_ERR_DUPLICATE);
+	} else if (global_store->users_count == MAX_USERS) {
+		printf(USER_ERR_TOO_MANY);
+	} else if (error_no_such_user) {
+		printf(GROUP_ERR_NO_SUCH_USER);
+	} else if (error_repeated) {
+		printf(GROUP_ERR_REPEATED_USER);
+	} else {
+		add_user(global_store, group_name);
+	}
+}
+
+/**
+ * Checks if a string is in a group member array with size 'size'.
+ * Returns 1 if so, otherwise returns 0.
+ */
+int in_char_array(char array[MAX_USER_NAME_LENGTH][MAX_GROUP_USERS], int size,
+                  char *el) {
+	int i;
+	for (i = 0; i < size; ++i) {
+		if (strcmp(array[i], el) == 0) {
+			return 1;
+		}
+	}
+	return 0;
 }
 
 /**

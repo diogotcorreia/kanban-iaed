@@ -2,13 +2,15 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#define WHITESPACE " \t\n"
+
 #define TIME_ERR_INVALID "invalid time\n"
 #define TIME_MSG "%d\n"
 
 /* tasks */
 
 #define MAX_TASKS 10000
-#define MAX_DESCRIPTION_LENGTH 51
+#define MAX_DESCRIPTION_LENGTH 101
 
 #define TASK_ADD_SUCCESS "task %d\n"
 #define TASK_TO_STRING "%d %s #%d %s\n"
@@ -28,7 +30,7 @@
 
 /* activities */
 
-#define MAX_ACTIVITY_NAME_LENGTH 51
+#define MAX_ACTIVITY_NAME_LENGTH 101
 #define MAX_ACTIVITIES 10
 
 #define ACTIVITY_TODO "TO DO"
@@ -44,12 +46,16 @@
 
 /* users */
 
-#define MAX_USER_NAME_LENGTH 21
+#define MAX_USER_NAME_LENGTH 101
 #define MAX_USERS 50
+#define MAX_GROUP_USERS 10
 
 #define USER_TO_STRING "%s\n"
 #define USER_ERR_TOO_MANY "too many users\n"
 #define USER_ERR_DUPLICATE "user already exists\n"
+
+#define GROUP_ERR_NO_SUCH_USER "no such user\n"
+#define GROUP_ERR_REPEATED_USER "repeated user\n"
 
 typedef struct {
 	char *description;
@@ -96,6 +102,11 @@ int move_command_has_errors(task *task, int user_id, int activity_id);
 void handle_list_by_activities_command(kanban *global_store);
 
 void handle_activities_command(kanban *global_store);
+
+void handle_groups_command(kanban *global_store);
+
+int in_char_array(char array[MAX_USER_NAME_LENGTH][MAX_GROUP_USERS], int size,
+                  char *el);
 
 int binary_search(const task_cmp *key, task **list, int nitems,
                   int (*compare)(const task *, const task_cmp *));
